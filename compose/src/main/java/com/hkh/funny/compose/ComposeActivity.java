@@ -17,18 +17,22 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 
 /**
- * TODO : 底部栏样式先不管.
+ * TODO : 底部栏样式先不管.  后续可以不设置windowSoftInputMode， 底部栏通过Dialog 来实现.
  *
  * Created by mrsimple on 12/4/2018.
  */
 
 public class ComposeActivity extends AppCompatActivity implements View.OnClickListener {
 
-    public static final int SELECT_AUDIO = 7726;
-    public static final int SELECT_CAMERA = 7727;
-    public static final int SELECT_GIF = 7724;
-    public static final int SELECT_IMAGE = 7723;
-    public static final int SELECT_VIDEO = 7725;
+    private static final int SELECT_AUDIO = 7726;
+    private static final int SELECT_CAMERA = 7727;
+    private static final int SELECT_GIF = 7724;
+    private static final int SELECT_IMAGE = 7723;
+    private static final int SELECT_VIDEO = 7725;
+
+    ViewStub mPrevStub;
+    ImageView mPrevImageView;
+    ImageView mPrevTypeImageView;
 
 
     public static void start(Context context) {
@@ -41,7 +45,7 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.compose_activity);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.id_toolbar);
+        Toolbar toolbar = findViewById(R.id.id_toolbar);
         //继承自ActionBarActivity
         setSupportActionBar(toolbar);
         //隐藏Toolbar的标题
@@ -133,11 +137,9 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
     }
 
 
-    ViewStub mPrevStub;
-    ImageView mPrevImageView;
-    ImageView mPrevTypeImageView;
 
-    private void handleActivityResult(int requestCode, Intent data) {
+
+    private void handleActivityResult(int requestCode, final Intent data) {
         if (mPrevStub == null) {
             mPrevStub = findViewById(R.id.media_preview_viewstub);
             View rootView = mPrevStub.inflate();
@@ -150,22 +152,26 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
             if ( requestCode == SELECT_IMAGE ) {
                 Picasso.with(this).load(data.getData()).into(mPrevImageView);
             } else if (requestCode == SELECT_VIDEO ) {
-//                String[] filePathColumn = {MediaStore.Images.Media.DATA};
-//                Cursor cursor = getContentResolver().query(data.getData(), filePathColumn, null, null, null);
-//                cursor.moveToFirst();
-//                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-//                String picturePath = cursor.getString(columnIndex);
-//                cursor.close();
-//
-//                Bitmap thumb = ThumbnailUtils.createVideoThumbnail(picturePath, MediaStore.Video.Thumbnails.MICRO_KIND) ;
-
-                mPrevTypeImageView.setImageResource(R.drawable.ic_compose_video);
-                mPrevTypeImageView.setVisibility(View.VISIBLE);
-
-                Bitmap thumb = getVideoThumb(this.getApplicationContext(), data.getData()) ;
-                mPrevImageView.setImageBitmap(thumb);
+                new Thread() {
+                    @Override
+                    public void run() {
+                        showVideoPreview(data);
+                    }
+                }.start();
             }
         }
+    }
+
+    private void showVideoPreview(final Intent data) {
+        final Bitmap thumb = getVideoThumb(ComposeActivity.this.getApplicationContext(), data.getData()) ;
+        mPrevImageView.post(new Runnable() {
+            @Override
+            public void run() {
+                mPrevImageView.setImageBitmap(thumb);
+                mPrevTypeImageView.setImageResource(R.drawable.ic_compose_video);
+                mPrevTypeImageView.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
 

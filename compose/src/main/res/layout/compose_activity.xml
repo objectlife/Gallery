@@ -10,8 +10,10 @@
               android:layout_height="wrap_content" android:layout_below="@id/id_toolbar"
               android:gravity="center"
               android:hint="@string/input_hint"
+              android:background="#f0f0f0"
               android:minHeight="60dp"/>
 
+    <!--todo : 这里应该使用 Fragment 来管理, 处理多种类型的preview -->
     <!--media preview-->
     <ViewStub android:id="@+id/media_preview_viewstub" android:layout_width="match_parent"
               android:layout_height="wrap_content"
