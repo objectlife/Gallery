@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Compose</string>
+    <string name="photo">Photo</string>
+    <string name="video">Video</string>
+    <string name="camera">Camera</string>
+    <string name="music">Music</string>
+    <string name="gif">Gif</string>
+
+    <string name="input_hint">写点啥~</string>
+</resources>
