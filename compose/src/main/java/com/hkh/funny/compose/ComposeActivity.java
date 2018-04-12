@@ -1,9 +1,9 @@
 package com.hkh.funny.compose;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -13,8 +13,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewStub;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.hkh.funny.compose.utils.MediaUtils;
 import com.squareup.picasso.Picasso;
+import com.theartofdev.edmodo.cropper.CropImage;
 
 /**
  * TODO : 底部栏样式先不管.  后续可以不设置windowSoftInputMode， 底部栏通过Dialog 来实现.
@@ -133,24 +136,34 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        handleActivityResult(requestCode, data);
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                Uri resultUri = result.getUri();
+                Picasso.with(this).load(resultUri).into(mPrevImageView);
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+                Toast.makeText(this, error.toString(), Toast.LENGTH_LONG).show();
+            }
+        } else if ( resultCode == Activity.RESULT_OK ){
+            handleActivityResult(requestCode, data);
+        } else {
+            Toast.makeText(this, "obtain media result : " + resultCode, Toast.LENGTH_SHORT).show();
+        }
     }
-
-
-
 
     private void handleActivityResult(int requestCode, final Intent data) {
         if (mPrevStub == null) {
             mPrevStub = findViewById(R.id.media_preview_viewstub);
             View rootView = mPrevStub.inflate();
-
             mPrevImageView = rootView.findViewById(R.id.media_prev_img);
             mPrevTypeImageView = rootView.findViewById(R.id.media_prev_type_img);
         }
 
         if ( mPrevImageView != null && data != null ) {
             if ( requestCode == SELECT_IMAGE ) {
-                Picasso.with(this).load(data.getData()).into(mPrevImageView);
+                // 拿到图片之后先裁剪.
+                CropImage.activity(data.getData()).start(this);
             } else if (requestCode == SELECT_VIDEO ) {
                 new Thread() {
                     @Override
@@ -163,7 +176,7 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void showVideoPreview(final Intent data) {
-        final Bitmap thumb = getVideoThumb(ComposeActivity.this.getApplicationContext(), data.getData()) ;
+        final Bitmap thumb = MediaUtils.getVideoThumb(ComposeActivity.this.getApplicationContext(), data.getData()) ;
         mPrevImageView.post(new Runnable() {
             @Override
             public void run() {
@@ -172,26 +185,5 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
                 mPrevTypeImageView.setVisibility(View.VISIBLE);
             }
         });
-    }
-
-
-    public static Bitmap getVideoThumb(Context context, Uri uri) {
-        MediaMetadataRetriever mediaMetadataRetriever = null;
-        Bitmap bitmap = null;
-        try {
-            mediaMetadataRetriever = new MediaMetadataRetriever();
-            mediaMetadataRetriever.setDataSource(context, uri);
-            bitmap = mediaMetadataRetriever.getFrameAtTime();
-            if (mediaMetadataRetriever != null) {
-                mediaMetadataRetriever.release();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (mediaMetadataRetriever != null) {
-                mediaMetadataRetriever.release();
-            }
-        }
-        return bitmap;
     }
 }
