@@ -82,7 +82,7 @@ public class ChooseCategoryActivity extends AppCompatActivity {
         mAdapter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TagDialogFragment fragment = TagDialogFragment.newInstance() ;
+                TagDialogFragment fragment = TagDialogFragment.newInstance(mAdapter.mCategories.get(position)) ;
                 fragment.show(getSupportFragmentManager(), TagDialogFragment.class.getSimpleName());
             }
         });
@@ -93,10 +93,11 @@ public class ChooseCategoryActivity extends AppCompatActivity {
      */
     public static class TagDialogFragment extends DialogFragment {
 
-        public static TagDialogFragment newInstance() {
-            Bundle args = new Bundle();
+        Category mCategory ;
+
+        public static TagDialogFragment newInstance(Category category) {
             TagDialogFragment fragment = new TagDialogFragment();
-            fragment.setArguments(args);
+            fragment.mCategory = category ;
             return fragment;
         }
 
@@ -116,7 +117,13 @@ public class ChooseCategoryActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle
                 savedInstanceState) {
             getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+            getDialog().setCanceledOnTouchOutside(false);
+
             final View view = inflater.inflate(R.layout.tag_dialog_layout, container, false);
+            TextView textView = view.findViewById(R.id.tag_tv) ;
+            if ( mCategory != null ) {
+                textView.setText(mCategory.name);
+            }
             slideToUp(view, new Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {
