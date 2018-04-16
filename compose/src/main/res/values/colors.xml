@@ -4,4 +4,6 @@
     <color name="colorPrimaryDark">#d8d8d8</color>
     <color name="colorAccent">#FF4081</color>
     <color name="tag_layout_bg_color">#b8ccff</color>
+    <color name="category_blue">#7b97e0</color>
+    <color name="post_btn_color">#3a3a3a</color>
 </resources>

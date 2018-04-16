@@ -7,30 +7,33 @@
     <RelativeLayout android:id="@+id/tag_top_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/colorPrimary"
-                    android:padding="8dp">
+                    android:background="@color/category_blue"
+                    android:gravity="center"
+                    android:padding="12dp">
 
-        <ImageView android:id="@+id/user_profile_imageview" android:layout_width="64dp"
-                   android:layout_height="64dp"
+        <ImageView android:id="@+id/user_profile_imageview" android:layout_width="48dp"
+                   android:layout_height="48dp"
                    android:src="@drawable/play_icon"/>
 
-        <TextView android:id="@+id/tag_tv" android:layout_width="match_parent"
+        <TextView android:id="@+id/tag_tv"
+                  android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:layout_centerVertical="true"
                   android:layout_marginLeft="15dp"
+                  android:textColor="@android:color/white"
                   android:layout_toRightOf="@id/user_profile_imageview"/>
 
     </RelativeLayout>
 
 
     <!--子tag选择布局-->
-    <ScrollView android:layout_width="match_parent" android:layout_height="200dp"
+    <ScrollView android:id="@+id/tag_center_layout" android:layout_width="match_parent"
+                android:layout_height="200dp"
                 android:layout_below="@id/tag_top_layout"
-                android:id="@+id/tag_center_layout"
                 android:background="@color/tag_layout_bg_color">
 
-        <com.zhy.view.flowlayout.TagFlowLayout android:layout_width="match_parent"
-                                               android:id="@+id/tag_flowlayout"
+        <com.zhy.view.flowlayout.TagFlowLayout android:id="@+id/tag_flowlayout"
+                                               android:layout_width="match_parent"
                                                android:layout_height="wrap_content"/>
     </ScrollView>
 
@@ -39,13 +42,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:layout_below="@id/tag_center_layout"
-                    android:background="#333333"
+                    android:background="@android:color/black"
                     android:paddingLeft="15dp"
                     android:paddingRight="15dp">
 
 
         <View android:id="@+id/divide_view"
-              android:layout_width="1dp"
+              android:layout_width="1px"
               android:layout_height="match_parent"
               android:layout_centerInParent="true"
               android:layout_marginBottom="2dp"
@@ -88,7 +91,7 @@
 
     <Button android:id="@+id/post_btn" android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/switch_layout" android:background="#666666"
+            android:layout_below="@id/switch_layout" android:background="@color/post_btn_color"
             android:padding="20dp"
             android:text="POST"
             android:textColor="@android:color/white"
