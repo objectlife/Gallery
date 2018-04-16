@@ -27,8 +27,12 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.weshare.compose.R;
+import com.weshare.domain.CateTag;
 import com.weshare.domain.Category;
 import com.weshare.utils.DisplayUtil;
+import com.zhy.view.flowlayout.FlowLayout;
+import com.zhy.view.flowlayout.TagAdapter;
+import com.zhy.view.flowlayout.TagFlowLayout;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -74,6 +78,11 @@ public class ChooseCategoryActivity extends AppCompatActivity {
             Category category = new Category();
             category.id = "id-" + i;
             category.name = "Word - " + i;
+
+            for (int j = 0; j < 6; j++) {
+                category.addTag(new CateTag("cate-" + j, "category " + j));
+            }
+
             mAdapter.mCategories.add(category);
         }
 
@@ -94,6 +103,7 @@ public class ChooseCategoryActivity extends AppCompatActivity {
     public static class TagDialogFragment extends DialogFragment {
 
         Category mCategory ;
+        TagFlowLayout mTagFlowLayout ;
 
         public static TagDialogFragment newInstance(Category category) {
             TagDialogFragment fragment = new TagDialogFragment();
@@ -123,6 +133,7 @@ public class ChooseCategoryActivity extends AppCompatActivity {
             TextView textView = view.findViewById(R.id.tag_tv) ;
             if ( mCategory != null ) {
                 textView.setText(mCategory.name);
+                initTagLayout(view);
             }
             slideToUp(view, new Animation.AnimationListener() {
                 @Override
@@ -141,6 +152,56 @@ public class ChooseCategoryActivity extends AppCompatActivity {
                 }
             });
             return view;
+        }
+
+
+        private void initTagLayout(View itemView) {
+            mTagFlowLayout = itemView.findViewById(R.id.tag_flowlayout) ;
+            if ( mCategory.tagsList != null ) {
+                TagAdapter tagAdapter = new TagAdapter<CateTag>(mCategory.tagsList) {
+                    @Override
+                    public View getView(FlowLayout parent, int position, CateTag item) {
+                        TextView itemView = (TextView)LayoutInflater.from(parent.getContext()).inflate(R.layout.tag_flow_item_layout, parent, false);
+                        if ( isCreateTagItem(position) ) {
+                            itemView.setTextColor(Color.WHITE);
+                            itemView.setBackgroundResource(R.drawable.tag_item_create);
+                        }
+                        if ( item != null ) {
+                            itemView.setText(item.name);
+                        }
+                        return itemView ;
+                    }
+
+                    @Override
+                    public CateTag getItem(int position) {
+                        if ( isCreateTagItem(position) ) {
+                            return new CateTag("create-id", "+ create");
+                        }
+                        return super.getItem(position);
+                    }
+
+                    @Override
+                    public int getCount() {
+                        return super.getCount() + 1;
+                    }
+                } ;
+                mTagFlowLayout.setAdapter(tagAdapter);
+                mTagFlowLayout.setMaxSelectCount(1);
+                tagAdapter.setSelectedList(0);
+                mTagFlowLayout.setOnTagClickListener(new TagFlowLayout.OnTagClickListener() {
+                    @Override
+                    public boolean onTagClick(View view, int position, FlowLayout parent) {
+                        if (  isCreateTagItem(position) ) {
+                            Toast.makeText(view.getContext(), "create tag", Toast.LENGTH_SHORT).show();
+                        }
+                        return false;
+                    }
+                });
+            }
+        }
+
+        private boolean isCreateTagItem(int position) {
+            return mCategory != null && mCategory.tagsList != null && position == mCategory.tagsList.size() ;
         }
 
         private void initWidgets(View itemView) {

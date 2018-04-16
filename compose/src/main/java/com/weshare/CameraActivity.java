@@ -21,6 +21,7 @@ import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -72,6 +73,13 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     FilterAdapter mFilterAdapter;
     private boolean isTakingPhoto = false;
     ProgressBar mProgressBar ;
+
+
+    public static void start(Context context) {
+        Intent starter = new Intent(context, CameraActivity.class);
+        context.startActivity(starter);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

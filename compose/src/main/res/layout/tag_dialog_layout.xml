@@ -3,6 +3,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
+    <!--一级分类视图-->
     <RelativeLayout android:id="@+id/tag_top_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -22,11 +23,18 @@
     </RelativeLayout>
 
 
-    <View android:id="@+id/tag_center_layout" android:layout_width="match_parent"
-          android:layout_height="200dp"
-          android:layout_below="@id/tag_top_layout"
-          android:background="@color/colorAccent"/>
+    <!--子tag选择布局-->
+    <ScrollView android:layout_width="match_parent" android:layout_height="200dp"
+                android:layout_below="@id/tag_top_layout"
+                android:id="@+id/tag_center_layout"
+                android:background="@color/tag_layout_bg_color">
 
+        <com.zhy.view.flowlayout.TagFlowLayout android:layout_width="match_parent"
+                                               android:id="@+id/tag_flowlayout"
+                                               android:layout_height="wrap_content"/>
+    </ScrollView>
+
+    <!-- 是否允许评论的布局-->
     <RelativeLayout android:id="@+id/switch_layout"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"

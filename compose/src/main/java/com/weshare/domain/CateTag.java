@@ -7,4 +7,9 @@ package com.weshare.domain;
 public class CateTag {
     public String id ;
     public String name ;
+
+    public CateTag(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 }
