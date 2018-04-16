@@ -12,6 +12,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewStub;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -36,6 +38,8 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
     ViewStub mPrevStub;
     ImageView mPrevImageView;
     ImageView mPrevTypeImageView;
+    View mPrevLayout ;
+    EditText mPostEdit ;
 
 
     public static void start(Context context) {
@@ -66,6 +70,8 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
         findViewById(R.id.take_camera_button).setOnClickListener(this);
 
         mMediaSelectLayout = findViewById(R.id.media_select_layout) ;
+
+        mPostEdit = findViewById(R.id.edit_text) ;
     }
 
 
@@ -113,8 +119,7 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
-                Uri resultUri = result.getUri();
-                Picasso.with(this).load(resultUri).into(mPrevImageView);
+                showImagePreview(result.getUri());
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
                 Toast.makeText(this, error.toString(), Toast.LENGTH_LONG).show();
@@ -126,12 +131,22 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
+
+
     private void handleActivityResult(int requestCode, final Intent data) {
         if (mPrevStub == null) {
             mPrevStub = findViewById(R.id.media_preview_viewstub);
-            View rootView = mPrevStub.inflate();
-            mPrevImageView = rootView.findViewById(R.id.media_prev_img);
-            mPrevTypeImageView = rootView.findViewById(R.id.media_prev_type_img);
+            mPrevLayout = mPrevStub.inflate();
+            mPrevImageView = mPrevLayout.findViewById(R.id.media_prev_img);
+            mPrevTypeImageView = mPrevLayout.findViewById(R.id.media_prev_type_img);
+
+            // hide prev layout & show keyboard
+            mPrevLayout.findViewById(R.id.close_image_btn).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    closePreviewLayout();
+                }
+            });
         }
 
         if ( mPrevImageView != null && data != null ) {
@@ -146,12 +161,31 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
                     }
                 }.start();
             } else if ( requestCode == SELECT_CAMERA ) {
-                Uri resultUri = data.getData();
-                Picasso.with(this).load(resultUri).into(mPrevImageView);
+                showImagePreview(data.getData());
             }
         }
 
         mMediaSelectLayout.setVisibility(View.GONE);
+    }
+
+
+    private void closePreviewLayout() {
+        mPrevTypeImageView.setVisibility(View.GONE);
+        mPrevLayout.setVisibility(View.GONE);
+
+        mMediaSelectLayout.setVisibility(View.VISIBLE);
+
+        InputMethodManager imm = (InputMethodManager)   getSystemService(Context.INPUT_METHOD_SERVICE);
+//        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+        imm.showSoftInput(mPostEdit, InputMethodManager.SHOW_IMPLICIT) ;
+    }
+
+
+    private void showImagePreview(Uri uri) {
+        mPrevTypeImageView.setVisibility(View.GONE);
+        mPrevLayout.setVisibility(View.VISIBLE);
+        mMediaSelectLayout.setVisibility(View.GONE);
+        Picasso.with(this).load(uri).into(mPrevImageView);
     }
 
 

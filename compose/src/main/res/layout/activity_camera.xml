@@ -15,9 +15,9 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout android:id="@+id/camera_root_layout"
+             xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:app="http://schemas.android.com/apk/res-auto"
-             android:id="@+id/camera_root_layout"
              android:layout_width="match_parent"
              android:layout_height="match_parent">
 
@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         app:showIcons="true"
-        >
+    >
 
         <ImageView
             android:id="@+id/prev_imageview"
@@ -61,8 +61,15 @@
         android:layout_marginTop="15dp"
         android:background="@null"
         android:src="@drawable/close_icon"
-        />
+    />
 
+
+    <ProgressBar android:id="@+id/camera_progress_bar" style="@style/Widget.AppCompat.ProgressBar"
+                 android:layout_width="48dp" android:layout_height="48dp"
+                 android:visibility="gone"
+                 android:layout_gravity="center"/>
+
+    <!--bottom action layout-->
     <RelativeLayout
         android:id="@+id/bottom_layout"
         android:layout_width="match_parent"
@@ -75,11 +82,11 @@
             android:id="@+id/stickers_btn"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="48dp"
             app:srcCompat="@drawable/sticker_icon"
-            />
+        />
 
         <Button
             android:id="@+id/take_photo_btn"
@@ -87,18 +94,18 @@
             android:layout_height="80dp"
             android:layout_centerInParent="true"
             android:background="@drawable/take_photo_bg"
-            />
+        />
 
         <!--todo : 注意后续按钮都替换成图片, 不适用 vector 或者 svg -->
         <android.support.v7.widget.AppCompatImageView
             android:id="@+id/switch_camera_btn"
             android:layout_width="36dp"
             android:layout_height="36dp"
+            android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="48dp"
-            android:layout_alignParentRight="true"
             app:srcCompat="@drawable/ic_switch_camera"
-            />
+        />
 
     </RelativeLayout>
 

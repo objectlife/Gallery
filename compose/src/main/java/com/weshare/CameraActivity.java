@@ -36,6 +36,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.cameraview.CameraView;
@@ -70,6 +71,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     private RecyclerView mEffectRecyclerView;
     FilterAdapter mFilterAdapter;
     private boolean isTakingPhoto = false;
+    ProgressBar mProgressBar ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +84,8 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         initStickerLayout();
         initEffectRecyclerView();
         initActionLayout();
+
+        mProgressBar = findViewById(R.id.camera_progress_bar) ;
     }
 
 
@@ -288,6 +292,8 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                     public void onAnimationEnd(Animator animation) {
                         shutterEffect.setVisibility(View.GONE);
                         shutterEffect.setAlpha(0.6f);
+
+                        mProgressBar.setVisibility(View.VISIBLE);
                     }
                 });
     }
@@ -381,6 +387,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
 
     public void onPictureTaken(String filePath) {
+        mProgressBar.setVisibility(View.GONE);
         Intent result = new Intent() ;
         result.setData(Uri.fromFile(new File(filePath)));
         setResult(RESULT_OK, result);
