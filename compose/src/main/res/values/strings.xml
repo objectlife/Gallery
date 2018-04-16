@@ -8,4 +8,6 @@
 
     <string name="input_hint">Write your post here...</string>
     <string name="create_post">Create a post</string>
+    <string name="comment">Comment</string>
+    <string name="post_share">Post Share</string>
 </resources>
