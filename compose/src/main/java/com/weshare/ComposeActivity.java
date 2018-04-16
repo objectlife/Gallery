@@ -32,6 +32,7 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
     private static final int SELECT_CAMERA = 7724;
     private static final int SELECT_VIDEO = 7725;
 
+    View mMediaSelectLayout ;
     ViewStub mPrevStub;
     ImageView mPrevImageView;
     ImageView mPrevTypeImageView;
@@ -63,6 +64,8 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
         findViewById(R.id.select_img_button).setOnClickListener(this);
         findViewById(R.id.select_video_button).setOnClickListener(this);
         findViewById(R.id.take_camera_button).setOnClickListener(this);
+
+        mMediaSelectLayout = findViewById(R.id.media_select_layout) ;
     }
 
 
@@ -142,9 +145,15 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
                         showVideoPreview(data);
                     }
                 }.start();
+            } else if ( requestCode == SELECT_CAMERA ) {
+                Uri resultUri = data.getData();
+                Picasso.with(this).load(resultUri).into(mPrevImageView);
             }
         }
+
+        mMediaSelectLayout.setVisibility(View.GONE);
     }
+
 
     private void showVideoPreview(final Intent data) {
         final Bitmap thumb = MediaUtils.getVideoThumb(ComposeActivity.this.getApplicationContext(), data.getData()) ;

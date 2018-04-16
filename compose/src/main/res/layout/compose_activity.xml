@@ -11,6 +11,7 @@
               android:gravity="center"
               android:hint="@string/input_hint"
               android:background="@null"
+              android:padding="8dp"
               android:minHeight="60dp"/>
 
     <!--todo : 这里应该使用 Fragment 来管理, 处理多种类型的preview -->
@@ -24,6 +25,7 @@
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:layout_alignParentBottom="true"
+                  android:id="@+id/media_select_layout"
                   android:layout_marginLeft="40dp"
                   android:layout_marginRight="40dp"
                   android:layout_marginBottom="20dp"

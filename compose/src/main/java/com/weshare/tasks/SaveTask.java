@@ -71,7 +71,7 @@ public class SaveTask extends Thread {
     @Override
     public void run() {
         final CameraActivity activity = mActivityRef.get() ;
-        if ( mActivityRef.get() == null || mActivityRef.get().isFinishing() ) {
+        if ( activity == null || activity.isFinishing() ) {
             return;
         }
 
@@ -89,7 +89,10 @@ public class SaveTask extends Thread {
                     Toast.makeText(activity, "Save image file failed :(",
                             Toast.LENGTH_SHORT).show();
                 } else {
-                    notifyGallery(activity, filePath);
+                    if ( activity != null ) {
+                        activity.onPictureTaken(filePath);
+                        notifyGallery(activity, filePath);
+                    }
                 }
             }
         });

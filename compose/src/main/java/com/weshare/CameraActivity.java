@@ -21,10 +21,12 @@ import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -42,6 +44,8 @@ import com.weshare.compose.R;
 import com.weshare.effect.FilterAdapter;
 import com.weshare.tasks.SaveTask;
 import com.xiaopo.flying.sticker.DrawableSticker;
+
+import java.io.File;
 
 /**
  * Camera Activity
@@ -373,6 +377,14 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
         // save picture
         new SaveTask(this, combineBitmap).start();
+    }
+
+
+    public void onPictureTaken(String filePath) {
+        Intent result = new Intent() ;
+        result.setData(Uri.fromFile(new File(filePath)));
+        setResult(RESULT_OK, result);
+        finish();
     }
 
 
