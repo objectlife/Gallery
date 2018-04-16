@@ -25,6 +25,7 @@ import com.weshare.utils.DisplayUtil;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by mrsimple on 16/4/2018.
@@ -89,6 +90,7 @@ public class ChooseCategoryActivity extends AppCompatActivity {
 
         final List<Category> mCategories = new LinkedList<>() ;
         AdapterView.OnItemClickListener mItemClickListener ;
+        private Random random = new Random();
 
         @Override
         public CategoryVH onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -107,9 +109,8 @@ public class ChooseCategoryActivity extends AppCompatActivity {
                 sRadius = new float[] { radius, radius, radius, radius, radius, radius, radius, radius } ;
             }
             shape.setCornerRadii(sRadius);
-            shape.setColor(position % 2 > 0 ? Color.GRAY : Color.DKGRAY);
-            holder.nameTv.setBackgroundDrawable(shape);
-
+            shape.setColor(Color.argb(255, random.nextInt(200), random.nextInt(200), random.nextInt(200)));
+            holder.itemView.setBackgroundDrawable(shape);
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

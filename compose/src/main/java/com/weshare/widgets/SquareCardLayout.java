@@ -1,24 +1,24 @@
 package com.weshare.widgets;
 
 import android.content.Context;
+import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
-import android.widget.RelativeLayout;
 
 /**
  * Created by mrsimple on 16/4/2018.
  */
 
-public class SquareRelativeLayout extends RelativeLayout {
+public class SquareCardLayout extends CardView {
 
-    public SquareRelativeLayout(Context context, AttributeSet attrs, int defStyle) {
+    public SquareCardLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
-    public SquareRelativeLayout(Context context, AttributeSet attrs) {
+    public SquareCardLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public SquareRelativeLayout(Context context) {
+    public SquareCardLayout(Context context) {
         super(context);
     }
 
