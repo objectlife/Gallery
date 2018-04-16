@@ -72,6 +72,7 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
         mMediaSelectLayout = findViewById(R.id.media_select_layout) ;
 
         mPostEdit = findViewById(R.id.edit_text) ;
+        findViewById(R.id.toolbar_right_button).setOnClickListener(this);
     }
 
 
@@ -88,7 +89,12 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
         if (v.getId() == R.id.take_camera_button) {
             performButtonClick(SELECT_CAMERA);
         }
+
+        if (v.getId() == R.id.toolbar_right_button) {
+            ChooseCategoryActivity.start(this, mMediaUri, mPostEdit.getText().toString().trim());
+        }
     }
+
 
     private void performButtonClick(int reqCode) {
         Intent intent = null;
@@ -124,6 +130,9 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
                 Exception error = result.getError();
                 Toast.makeText(this, error.toString(), Toast.LENGTH_LONG).show();
             }
+
+            InputMethodManager imm = (InputMethodManager)   getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(mPostEdit, InputMethodManager.SHOW_IMPLICIT) ;
         } else if ( resultCode == Activity.RESULT_OK ){
             handleActivityResult(requestCode, data);
         } else {
@@ -169,6 +178,8 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
     }
 
 
+    Uri mMediaUri;
+
     private void closePreviewLayout() {
         mPrevTypeImageView.setVisibility(View.GONE);
         mPrevLayout.setVisibility(View.GONE);
@@ -178,6 +189,8 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
         InputMethodManager imm = (InputMethodManager)   getSystemService(Context.INPUT_METHOD_SERVICE);
 //        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
         imm.showSoftInput(mPostEdit, InputMethodManager.SHOW_IMPLICIT) ;
+
+        mMediaUri = null;
     }
 
 
@@ -186,11 +199,14 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
         mPrevLayout.setVisibility(View.VISIBLE);
         mMediaSelectLayout.setVisibility(View.GONE);
         Picasso.with(this).load(uri).into(mPrevImageView);
+
+        mMediaUri = uri ;
     }
 
 
     private void showVideoPreview(final Intent data) {
-        final Bitmap thumb = MediaUtils.getVideoThumb(ComposeActivity.this.getApplicationContext(), data.getData()) ;
+        mMediaUri = data.getData() ;
+        final Bitmap thumb = MediaUtils.getVideoThumb(ComposeActivity.this.getApplicationContext(), mMediaUri) ;
         mPrevImageView.post(new Runnable() {
             @Override
             public void run() {

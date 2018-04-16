@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-            android:background="#707070"
-             android:layout_height="300dp">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#707070">
 
     <FrameLayout android:layout_width="match_parent"
-                 android:layout_height="match_parent">
+                 android:layout_height="wrap_content">
 
         <ImageView android:id="@+id/media_prev_img" android:layout_width="match_parent"
-                   android:layout_height="wrap_content"/>
+                   android:layout_height="match_parent"
+                   android:layout_gravity="center_horizontal|top"/>
 
         <ImageView android:id="@+id/media_prev_type_img"
                    android:layout_width="48dp"
                    android:layout_height="48dp"
-                   android:visibility="gone"
-                   android:layout_gravity="center"
                    android:src="@drawable/play_icon"
+                   android:visibility="gone"
         />
 
 
         <ImageView android:id="@+id/close_image_btn"
                    android:layout_width="30dp"
                    android:layout_height="30dp"
-                   android:src="@drawable/close_icon"
-                   android:padding="3dp"
-                   android:layout_margin="15dp"
                    android:layout_gravity="top|right"
+                   android:layout_margin="15dp"
+                   android:padding="3dp"
+                   android:src="@drawable/close_icon"
         />
 
     </FrameLayout>
