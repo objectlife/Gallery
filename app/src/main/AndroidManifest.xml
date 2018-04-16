@@ -17,7 +17,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.hkh.funny.compose.ComposeActivity"
+        <activity android:name="com.weshare.ComposeActivity"
                   android:screenOrientation="portrait" android:theme="@style/ToolBarTheme"
                   android:windowSoftInputMode="adjustResize|stateVisible"/>
     </application>

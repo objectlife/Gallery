@@ -1,13 +1,17 @@
-<manifest package="com.hkh.funny.compose"
+<manifest package="com.weshare.compose"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <application>
 
 
         <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
                   android:theme="@style/Base.Theme.AppCompat"/>
+
+        <activity android:name="com.weshare.CameraActivity" android:screenOrientation="portrait" android:theme="@style/ToolBarTheme"/>
     </application>
 </manifest>

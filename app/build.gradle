@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.hkh.funny.composeproject"
-        minSdkVersion 14
+        minSdkVersion 15
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"

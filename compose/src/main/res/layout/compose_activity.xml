@@ -10,7 +10,7 @@
               android:layout_height="wrap_content" android:layout_below="@id/id_toolbar"
               android:gravity="center"
               android:hint="@string/input_hint"
-              android:background="#f0f0f0"
+              android:background="@null"
               android:minHeight="60dp"/>
 
     <!--todo : 这里应该使用 Fragment 来管理, 处理多种类型的preview -->
@@ -24,6 +24,9 @@
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:layout_alignParentBottom="true"
+                  android:layout_marginLeft="40dp"
+                  android:layout_marginRight="40dp"
+                  android:layout_marginBottom="20dp"
                   android:orientation="horizontal">
 
         <TextView android:id="@+id/select_img_button" android:layout_width="0dp"
@@ -44,19 +47,6 @@
                   android:layout_weight="1"
                   android:drawableTop="@drawable/ic_compose_camera"
                   android:gravity="center" android:text="@string/camera"/>
-
-        <TextView android:id="@+id/take_music_button" android:layout_width="0dp"
-                  android:layout_height="wrap_content"
-                  android:layout_weight="1"
-                  android:drawableTop="@drawable/ic_compose_audio"
-                  android:gravity="center" android:text="@string/music"/>
-
-        <TextView android:id="@+id/take_gif_button" android:layout_width="0dp"
-                  android:layout_height="wrap_content"
-                  android:layout_weight="1"
-                  android:drawableTop="@drawable/ic_compose_gif"
-                  android:gravity="center" android:text="@string/gif"/>
-
     </LinearLayout>
 
 </RelativeLayout>

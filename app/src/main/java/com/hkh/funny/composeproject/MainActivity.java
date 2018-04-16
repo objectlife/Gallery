@@ -4,7 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
-import com.hkh.funny.compose.ComposeActivity;
+import com.weshare.ComposeActivity;
 
 public class MainActivity extends AppCompatActivity {
 

@@ -1,12 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 26
-
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 21
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
 
@@ -25,15 +25,16 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
+    implementation "com.android.support:exifinterface:$supportLibraryVersion"
+    implementation "com.android.support:recyclerview-v7:$supportLibraryVersion"
+
+    implementation project(':cameraviewplus')
+    implementation project(':stickerview')
 
 
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation ('com.theartofdev.edmodo:android-image-cropper:2.5.1')
-
-//            {
-//        exclude group:'com.android.support'
-//    }
 
 
     testImplementation 'junit:junit:4.12'

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/layout_filter_tab"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@android:color/white"
+              android:orientation="vertical">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/effect_recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="none"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@android:color/darker_gray"/>
+
+    <ImageView
+        android:id="@+id/btn_camera_closefilter"
+        android:layout_width="match_parent"
+        android:layout_height="26dip"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_gravity="center_horizontal"
+        android:scaleType="center"
+        android:src="@drawable/btn_layout_filters_bar_close"/>
+</LinearLayout>
