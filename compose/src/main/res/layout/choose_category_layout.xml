@@ -18,7 +18,6 @@
               android:layout_marginTop="10dp"
               android:layout_below="@id/id_toolbar"
               android:layout_toRightOf="@id/category_prev_imageview"
-              android:gravity="center"
               android:maxLines="3"
               android:textSize="14sp"
               android:text="@string/app_name"/>

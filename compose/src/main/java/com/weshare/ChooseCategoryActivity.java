@@ -256,7 +256,6 @@ public class ChooseCategoryActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(CategoryVH holder, final int position) {
             holder.nameTv.setText(mCategories.get(position).name);
-
             GradientDrawable shape = new GradientDrawable();
             shape.setShape(GradientDrawable.RECTANGLE);
             int radius = DisplayUtil.dip2px(holder.itemView.getContext(), 5);
@@ -292,11 +291,13 @@ public class ChooseCategoryActivity extends AppCompatActivity {
      */
     static class CategoryVH extends RecyclerView.ViewHolder {
 
+        ImageView iconImageView ;
         TextView nameTv;
 
         public CategoryVH(View itemView) {
             super(itemView);
             nameTv = itemView.findViewById(R.id.category_name_tv);
+            iconImageView = itemView.findViewById(R.id.category_imageview) ;
         }
     }
 }
