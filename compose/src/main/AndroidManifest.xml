@@ -13,6 +13,7 @@
                   android:theme="@style/Base.Theme.AppCompat"/>
 
         <activity android:name="com.weshare.CameraActivity" android:screenOrientation="portrait" android:theme="@style/ToolBarTheme"/>
-        <activity android:name="com.weshare.ChooseCategoryActivity" android:screenOrientation="portrait" />
+        <activity android:name="com.weshare.ChooseCategoryActivity" android:screenOrientation="portrait" android:theme="@style/ToolBarTheme"/>
+        <activity android:name="com.weshare.search.SearchTagActivity" android:screenOrientation="portrait" android:theme="@style/ToolBarTheme"/>
     </application>
 </manifest>

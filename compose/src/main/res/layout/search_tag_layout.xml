@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <RelativeLayout android:id="@+id/search_toolbar_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="#dcdcdc">
+
+        <ImageView android:id="@+id/search_back_btn" android:layout_width="36dp"
+                   android:layout_height="36dp"
+                   android:layout_centerVertical="true"
+                   android:layout_marginLeft="15dp"
+                   android:layout_marginRight="15dp"
+                   android:src="@drawable/ic_arrow_back_black_24dp"/>
+
+        <EditText android:id="@+id/search_edit" android:layout_width="match_parent"
+                  android:layout_height="36dp"
+                  android:layout_centerVertical="true"
+                  android:layout_marginRight="10dp"
+                  android:layout_toRightOf="@id/search_back_btn"
+                  android:background="@drawable/search_edittext_bg"
+                  android:hint="@string/Search"
+                  android:imeOptions="actionSearch"
+                  android:paddingLeft="15dp"
+                  android:paddingRight="30dp" android:singleLine="true"
+                  android:textSize="14sp"/>
+
+        <ImageView android:id="@+id/search_clear_btn" android:layout_width="16dp"
+                   android:layout_height="16dp"
+                   android:layout_alignParentRight="true"
+                   android:layout_centerVertical="true"
+                   android:layout_marginRight="25dp"
+                   android:src="@drawable/close_icon"/>
+
+    </RelativeLayout>
+
+    <android.support.v7.widget.RecyclerView android:id="@+id/search_tag_recyclerview"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:layout_below="@id/search_toolbar_layout"
+                                            android:background="#f0f0f0"/>
+
+    <ViewStub android:id="@+id/search_no_match_viewstub"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_below="@id/search_toolbar_layout"
+              android:layout_marginTop="64dp"
+              android:layout="@layout/search_tag_no_match_layout"/>
+
+    <ProgressBar android:id="@+id/search_progress_bar" style="@style/Widget.AppCompat.ProgressBar"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_centerInParent="true"
+                 android:visibility="gone"/>
+
+</RelativeLayout>

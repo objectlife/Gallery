@@ -3,9 +3,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
+    <include layout="@layout/toolbar_layout" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+
     <ImageView android:id="@+id/category_prev_imageview"
                android:layout_width="120dp"
                android:layout_height="75dp"
+               android:layout_below="@id/id_toolbar"
                android:layout_margin="10dp"
                android:scaleType="centerCrop" android:src="@drawable/play_icon"/>
 
@@ -13,6 +16,7 @@
               android:layout_height="wrap_content"
               android:layout_marginRight="10dp"
               android:layout_marginTop="10dp"
+              android:layout_below="@id/id_toolbar"
               android:layout_toRightOf="@id/category_prev_imageview"
               android:gravity="center"
               android:maxLines="3"

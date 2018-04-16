@@ -29,6 +29,7 @@ import com.squareup.picasso.Picasso;
 import com.weshare.compose.R;
 import com.weshare.domain.CateTag;
 import com.weshare.domain.Category;
+import com.weshare.search.SearchTagActivity;
 import com.weshare.utils.DisplayUtil;
 import com.zhy.view.flowlayout.FlowLayout;
 import com.zhy.view.flowlayout.TagAdapter;
@@ -95,6 +96,14 @@ public class ChooseCategoryActivity extends AppCompatActivity {
                 fragment.show(getSupportFragmentManager(), TagDialogFragment.class.getSimpleName());
             }
         });
+
+        findViewById(R.id.toolbar_right_button).setVisibility(View.GONE);
+        findViewById(R.id.toolbar_left_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     /**
@@ -127,7 +136,7 @@ public class ChooseCategoryActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle
                 savedInstanceState) {
             getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
-            getDialog().setCanceledOnTouchOutside(false);
+//            getDialog().setCanceledOnTouchOutside(false);
 
             final View view = inflater.inflate(R.layout.tag_dialog_layout, container, false);
             TextView textView = view.findViewById(R.id.tag_tv) ;
@@ -193,6 +202,7 @@ public class ChooseCategoryActivity extends AppCompatActivity {
                     public boolean onTagClick(View view, int position, FlowLayout parent) {
                         if (  isCreateTagItem(position) ) {
                             Toast.makeText(view.getContext(), "create tag", Toast.LENGTH_SHORT).show();
+                            SearchTagActivity.start(view.getContext());
                         }
                         return false;
                     }

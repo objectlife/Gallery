@@ -43,6 +43,7 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
     ImageView mPrevTypeImageView;
     View mPrevLayout ;
     EditText mPostEdit ;
+    Uri mMediaUri;
 
 
     public static void start(Context context) {
@@ -132,17 +133,18 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
                 Toast.makeText(this, error.toString(), Toast.LENGTH_LONG).show();
+                closePreviewLayout();
+            } else {
+                closePreviewLayout();
             }
-
-            InputMethodManager imm = (InputMethodManager)   getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.showSoftInput(mPostEdit, InputMethodManager.SHOW_IMPLICIT) ;
+            showKeyboard();
         } else if ( resultCode == Activity.RESULT_OK ){
             handleActivityResult(requestCode, data);
         } else {
             Toast.makeText(this, "obtain media result : " + resultCode, Toast.LENGTH_SHORT).show();
+            closePreviewLayout();
         }
     }
-
 
 
     private void handleActivityResult(int requestCode, final Intent data) {
@@ -185,18 +187,16 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
     }
 
 
-    Uri mMediaUri;
-
     private void closePreviewLayout() {
-        mPrevTypeImageView.setVisibility(View.GONE);
-        mPrevLayout.setVisibility(View.GONE);
+        if ( mPrevTypeImageView != null ) {
+            mPrevTypeImageView.setVisibility(View.GONE);
+        }
+        if ( mPrevLayout != null ) {
+            mPrevLayout.setVisibility(View.GONE);
+        }
 
         mMediaSelectLayout.setVisibility(View.VISIBLE);
-
-        InputMethodManager imm = (InputMethodManager)   getSystemService(Context.INPUT_METHOD_SERVICE);
-//        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-        imm.showSoftInput(mPostEdit, InputMethodManager.SHOW_IMPLICIT) ;
-
+        showKeyboard();
         mMediaUri = null;
     }
 
@@ -206,8 +206,19 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
         mPrevLayout.setVisibility(View.VISIBLE);
         mMediaSelectLayout.setVisibility(View.GONE);
         Picasso.with(this).load(uri).into(mPrevImageView);
-
         mMediaUri = uri ;
+    }
+
+
+    private void showKeyboard() {
+        mPostEdit.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mPostEdit.requestFocus() ;
+                InputMethodManager imm = (InputMethodManager)   getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(mPostEdit, InputMethodManager.SHOW_IMPLICIT) ;
+            }
+        }, 300);
     }
 
 
