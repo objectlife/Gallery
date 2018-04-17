@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -22,7 +21,6 @@ import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 import com.weshare.compose.R;
-import com.weshare.utils.DisplayUtil;
 import com.weshare.utils.MediaUtils;
 
 /**
@@ -167,7 +165,6 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
             if ( requestCode == SELECT_IMAGE ) {
                 // 拿到图片之后先裁剪.
                 CropImage.activity(data.getData())
-                        .setInitialCropWindowRectangle(new Rect(0,0, DisplayUtil.getDisplayWidthPixels(this), DisplayUtil.getDisplayWidthPixels(this)))
                         .setCropShape(CropImageView.CropShape.RECTANGLE)
                         .setCropMenuCropButtonIcon(R.drawable.ic_check_box_green_24dp)
                         .start(this);

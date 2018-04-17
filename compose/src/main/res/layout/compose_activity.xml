@@ -18,6 +18,7 @@
     <!--media preview-->
     <ViewStub android:id="@+id/media_preview_viewstub" android:layout_width="match_parent"
               android:layout_height="wrap_content"
+              android:layout_marginTop="15dp"
               android:layout_below="@id/edit_text" android:layout="@layout/media_preview_layout"/>
 
 
