@@ -111,6 +111,8 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
     private void initCameraView() {
         cameraView = findViewById(R.id.camera_view);
+        cameraView.setFlash(CameraView.FLASH_AUTO);
+
         shutterEffect = findViewById(R.id.shutter_effect);
     }
 
