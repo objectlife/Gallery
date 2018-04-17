@@ -21,6 +21,7 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,6 +39,7 @@ import com.zhy.view.flowlayout.TagFlowLayout;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * Created by mrsimple on 16/4/2018.
@@ -113,6 +115,7 @@ public class ChooseCategoryActivity extends AppCompatActivity {
 
         Category mCategory ;
         TagFlowLayout mTagFlowLayout ;
+        Button mPostBtn ;
 
         public static TagDialogFragment newInstance(Category category) {
             TagDialogFragment fragment = new TagDialogFragment();
@@ -166,6 +169,7 @@ public class ChooseCategoryActivity extends AppCompatActivity {
 
         private void initTagLayout(View itemView) {
             mTagFlowLayout = itemView.findViewById(R.id.tag_flowlayout) ;
+            mPostBtn = itemView.findViewById(R.id.post_btn) ;
             if ( mCategory.tagsList != null ) {
                 TagAdapter tagAdapter = new TagAdapter<CateTag>(mCategory.tagsList) {
                     @Override
@@ -197,6 +201,12 @@ public class ChooseCategoryActivity extends AppCompatActivity {
                 mTagFlowLayout.setAdapter(tagAdapter);
                 mTagFlowLayout.setMaxSelectCount(1);
                 tagAdapter.setSelectedList(0);
+                mTagFlowLayout.setOnSelectListener(new TagFlowLayout.OnSelectListener() {
+                    @Override
+                    public void onSelected(Set<Integer> selectPosSet) {
+                        mPostBtn.setSelected(true);
+                    }
+                });
                 mTagFlowLayout.setOnTagClickListener(new TagFlowLayout.OnTagClickListener() {
                     @Override
                     public boolean onTagClick(View view, int position, FlowLayout parent) {
