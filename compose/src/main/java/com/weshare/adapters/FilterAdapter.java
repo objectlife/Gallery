@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.weshare.effect;
+package com.weshare.adapters;
 
 /**
  * Created by mrsimple on 14/4/2018.
@@ -103,7 +103,7 @@ public class FilterAdapter extends RecyclerView.Adapter<FilterAdapter.FilterHold
 
         public FilterHolder(View itemView) {
             super(itemView);
-            this.thumbImage = itemView.findViewById(R.id.item_effect_imageview);
+            this.thumbImage = itemView.findViewById(R.id.item_imageview);
         }
     }
 

@@ -37,8 +37,8 @@
 
     <ProgressBar android:id="@+id/camera_progress_bar" style="@style/Widget.AppCompat.ProgressBar"
                  android:layout_width="48dp" android:layout_height="48dp"
-                 android:visibility="gone"
-                 android:layout_gravity="center"/>
+                 android:layout_gravity="center"
+                 android:visibility="gone"/>
 
     <!--bottom action layout-->
     <RelativeLayout
@@ -80,10 +80,16 @@
 
     </RelativeLayout>
 
+
+    <include layout="@layout/sticker_layout" android:layout_width="match_parent"
+             android:layout_height="wrap_content" android:layout_gravity="bottom"
+             android:layout_marginBottom="140dp"/>
+
+
     <View
         android:id="@+id/shutter_effect"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:alpha="0.6"
         android:background="@android:color/white"
         android:visibility="gone"/>

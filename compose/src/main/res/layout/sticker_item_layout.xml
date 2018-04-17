@@ -3,15 +3,27 @@
              android:layout_width="wrap_content"
              android:layout_height="match_parent"
              android:layout_margin="5dp"
-    >
+>
 
     <ImageView
+        android:id="@+id/item_imageview"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:id="@+id/item_effect_imageview"
         android:layout_gravity="center"
         android:scaleType="centerCrop"
-        >
+    >
+    </ImageView>
+
+
+    <ImageView
+        android:id="@+id/item_type_imageview"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_compose_video"
+    >
     </ImageView>
 
 </FrameLayout>

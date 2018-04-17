@@ -23,42 +23,62 @@ import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.cameraview.CameraView;
 import com.google.android.cameraview.CameraViewImpl;
+import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
+import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
+import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
+import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
+import com.nostra13.universalimageloader.utils.StorageUtils;
+import com.weshare.adapters.GalleryAdapter;
 import com.weshare.compose.R;
+import com.weshare.domain.MediaItem;
 import com.weshare.tasks.SaveTask;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Camera Activity
  */
-public class CameraActivity extends AppCompatActivity implements View.OnClickListener {
+public class CameraActivity extends AppCompatActivity implements View.OnClickListener , LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int PERMISSION_CODE_STORAGE = 3001;
     private static final int PERMISSION_CODE_CAMERA = 3002;
 
     CameraView cameraView;
-
     View shutterEffect;
     View captureButton;
     View switchButton;
-    com.xiaopo.flying.sticker.StickerView stickerView;
-    ImageView prevImageView;
     View actionLayout;
     private ImageView flashButton;
     private boolean isTakingPhoto = false;
     ProgressBar mProgressBar ;
+    private RecyclerView mGalleryRecyclerView;
+    private GalleryAdapter mGalleryAdapter;
 
 
     public static void start(Context context) {
@@ -72,64 +92,29 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
 
-//        cameraHeight = (int) (getResources().getDisplayMetrics().widthPixels * 4.0f / 3);
-
         initCameraView();
-//        initStickerLayout();
+        initGalleryRecyclerView();
         initActionLayout();
 
         mProgressBar = findViewById(R.id.camera_progress_bar) ;
+
+        findViewById(R.id.swipe_up_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(CameraActivity.this, "swipe up", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 
     private void initCameraView() {
         cameraView = findViewById(R.id.camera_view);
-//        ViewGroup.LayoutParams params = cameraView.getLayoutParams();
-//        if (params != null) {
-//            params.width = getResources().getDisplayMetrics().widthPixels;
-//            params.height = cameraHeight;
-//            cameraView.setLayoutParams(params);
-//        }
-
         shutterEffect = findViewById(R.id.shutter_effect);
-
-//        ViewGroup.LayoutParams shutterEffectLayoutParams = shutterEffect.getLayoutParams();
-//        if (shutterEffectLayoutParams != null) {
-//            shutterEffectLayoutParams.width = getResources().getDisplayMetrics().widthPixels;
-//            shutterEffectLayoutParams.height = cameraHeight;
-//            shutterEffect.setLayoutParams(shutterEffectLayoutParams);
-//        }
     }
-
-//    private void initStickerLayout() {
-//        stickerView = findViewById(R.id.sticker_view);
-//        ViewGroup.LayoutParams params = stickerView.getLayoutParams();
-//        if (params != null) {
-//            params.height = cameraHeight;
-//            stickerView.setLayoutParams(params);
-//        }
-//
-//        prevImageView = findViewById(R.id.prev_imageview);
-//        ViewGroup.LayoutParams prevParams = prevImageView.getLayoutParams();
-//        if (prevParams != null) {
-//            prevParams.height = cameraHeight;
-//            prevImageView.setLayoutParams(prevParams);
-//        }
-//    }
-//
-//    private int getBottomActionLayoutHeight() {
-//        return getResources().getDisplayMetrics().heightPixels - cameraHeight;
-//    }
 
 
     private void initActionLayout() {
         actionLayout = findViewById(R.id.bottom_layout);
-//        ViewGroup.LayoutParams params = actionLayout.getLayoutParams();
-//        if (params != null) {
-//            params.width = getResources().getDisplayMetrics().widthPixels;
-//            params.height = getBottomActionLayoutHeight();
-//            actionLayout.setLayoutParams(params);
-//        }
 
         captureButton = findViewById(R.id.take_photo_btn);
         captureButton.setOnClickListener(this);
@@ -139,6 +124,37 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
         flashButton = findViewById(R.id.flash_btn);
         flashButton.setOnClickListener(this);
+
+        initImageLoaders();
+    }
+
+    private void initImageLoaders() {
+
+        DisplayImageOptions options = new DisplayImageOptions.Builder().bitmapConfig(Bitmap.Config.RGB_565).cacheInMemory(true).cacheOnDisk(true).build() ;
+
+        // DON'T COPY THIS CODE TO YOUR PROJECT! This is just example of ALL options using.
+        // See the sample project how to use ImageLoader correctly.
+        File cacheDir = StorageUtils.getCacheDirectory(getApplicationContext());
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
+                .memoryCacheExtraOptions(480, 800) // default = device screen dimensions
+                .diskCacheExtraOptions(480, 800, null)
+                .threadPoolSize(3) // default
+                .threadPriority(Thread.NORM_PRIORITY - 2)       // default
+                .tasksProcessingOrder(QueueProcessingType.LIFO) // default
+                .denyCacheImageMultipleSizesInMemory()
+                .memoryCache(new LruMemoryCache(2 * 1024 * 1024))
+                .memoryCacheSize(2 * 1024 * 1024)
+                .memoryCacheSizePercentage(13) // default
+                .diskCache(new UnlimitedDiskCache(cacheDir)) // default
+                .diskCacheSize(50 * 1024 * 1024)
+                .diskCacheFileCount(100)
+                .diskCacheFileNameGenerator(new HashCodeFileNameGenerator()) // default
+                .imageDownloader(new BaseImageDownloader(getApplicationContext())) // default
+                .defaultDisplayImageOptions(options) // default
+                .writeDebugLogs()
+                .build();
+
+        ImageLoader.getInstance().init(config);
     }
 
 
@@ -162,40 +178,71 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-//    private void initEffectRecyclerView() {
-//        mEffectLayout = findViewById(R.id.stickers_layout);
-//
-//        ViewGroup.LayoutParams params = mEffectLayout.getLayoutParams();
-//        if (params != null) {
-//            params.height = getBottomActionLayoutHeight();
-//            mEffectLayout.setLayoutParams(params);
-//        }
-//
-//        mEffectRecyclerView = findViewById(R.id.effect_recyclerView);
-//
-//        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-//        layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-//        mEffectRecyclerView.setLayoutManager(layoutManager);
-//
-//        mFilterAdapter = new FilterAdapter(this, new String[]{"flower", "smile", "glassed"});
-//        mFilterAdapter.setOnFilterChangeListener(new FilterAdapter.onFilterChangeListener() {
-//            @Override
-//            public void onFilterChanged(String filterType, int position) {
-//                addSticker(position);
-//                hideFilters();
-//            }
-//        });
-//
-//        mEffectRecyclerView.setAdapter(mFilterAdapter);
-//
-//        findViewById(R.id.btn_camera_closefilter).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                hideFilters();
-//            }
-//        });
-//    }
+    private void initGalleryRecyclerView() {
+        mGalleryRecyclerView = findViewById(R.id.effect_recyclerView);
 
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        mGalleryRecyclerView.setLayoutManager(layoutManager);
+
+        mGalleryAdapter = new GalleryAdapter() ;
+        mGalleryRecyclerView.setAdapter(mGalleryAdapter);
+        mGalleryAdapter.setOnFilterChangeListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(CameraActivity.this, "click : " + mGalleryAdapter.getItem(position).path, Toast.LENGTH_SHORT).show();
+            }
+        });
+        // init loader
+        getSupportLoaderManager().initLoader(1, null, this) ;
+    }
+
+
+    // Get relevant columns for use later.
+    String[] projection = {
+            MediaStore.Files.FileColumns._ID,
+            MediaStore.Files.FileColumns.DATA,
+            MediaStore.Files.FileColumns.DATE_ADDED,
+            MediaStore.Files.FileColumns.MEDIA_TYPE,
+            MediaStore.Files.FileColumns.MIME_TYPE,
+            MediaStore.Files.FileColumns.TITLE
+    };
+
+    // Return only video and image metadata.
+    String selection = MediaStore.Files.FileColumns.MEDIA_TYPE + "="
+            + MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
+            + " OR "
+            + MediaStore.Files.FileColumns.MEDIA_TYPE + "="
+            + MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO;
+
+    @Override
+    public android.support.v4.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Uri queryUri = MediaStore.Files.getContentUri("external");
+        return new CursorLoader(this, queryUri, projection, selection, null, // Selection args (none).
+                MediaStore.Files.FileColumns.DATE_ADDED + " DESC" // Sort order.
+        );
+    }
+
+    @Override
+    public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor cursor) {
+        List<MediaItem> mediaItems = new LinkedList<>() ;
+        while (cursor.moveToNext()) {
+            long id = cursor.getLong(0) ;
+            String filePath = cursor.getString(1) ;
+            int mediaType = cursor.getInt(3) ;
+
+            Log.e("ryze_photo", "### 1 media id : " + id
+                    + ", 2 : " + filePath + ", 3 : " + cursor.getString(2) + ", 4 : " + mediaType);
+            mediaItems.add(MediaItem.create(id, mediaType, filePath)) ;
+        }
+        mGalleryAdapter.addMedia(mediaItems);
+        cursor.close();
+    }
+
+    @Override
+    public void onLoaderReset(android.support.v4.content.Loader<Cursor> loader) {
+
+    }
 
 
     @Override
@@ -348,31 +395,6 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         cameraView.setFlash(mode);
         flashButton.setImageResource(iconRes);
     }
-
-
-//    private void hideFilters() {
-//        ObjectAnimator animator = ObjectAnimator.ofFloat(mEffectLayout, "translationY", 0,
-//                mEffectLayout.getHeight());
-//        animator.setDuration(200);
-//        animator.addListener(new AnimatorListenerAdapter() {
-//            @Override
-//            public void onAnimationEnd(Animator animation) {
-//                hideEffectLayout();
-//            }
-//
-//            @Override
-//            public void onAnimationCancel(Animator animation) {
-//                hideEffectLayout();
-//            }
-//
-//            private void hideEffectLayout() {
-//                mEffectLayout.setVisibility(View.INVISIBLE);
-//                captureButton.setClickable(true);
-//            }
-//        });
-//        animator.start();
-//    }
-
 
     /**
      * 将拍照得到的照片添加到 sticker view 中的 ImageView中，然后再对整个 stickerView 进行截图，得到跟贴纸合并后的图像, 最后保存
