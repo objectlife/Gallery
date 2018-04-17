@@ -226,7 +226,6 @@ public class ComposeActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void run() {
                 mPrevImageView.setImageBitmap(thumb);
-                mPrevTypeImageView.setImageResource(R.drawable.ic_compose_video);
                 mPrevTypeImageView.setVisibility(View.VISIBLE);
             }
         });

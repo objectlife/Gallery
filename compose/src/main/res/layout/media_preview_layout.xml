@@ -14,6 +14,7 @@
         <ImageView android:id="@+id/media_prev_type_img"
                    android:layout_width="48dp"
                    android:layout_height="48dp"
+                   android:layout_gravity="center"
                    android:src="@drawable/play_icon"
                    android:visibility="gone"
         />
