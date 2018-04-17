@@ -79,14 +79,14 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryH
         return mediaItems.get(position);
     }
 
-    public void addMedia(MediaItem item) {
+    public void addItem(MediaItem item) {
         if (item != null) {
             mediaItems.add(item);
             notifyDataSetChanged();
         }
     }
 
-    public void addMedia(List<MediaItem> items) {
+    public void addItems(List<MediaItem> items) {
         if (items != null) {
             mediaItems.addAll(items);
             notifyDataSetChanged();

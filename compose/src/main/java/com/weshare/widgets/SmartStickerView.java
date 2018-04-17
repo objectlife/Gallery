@@ -51,6 +51,7 @@ public class SmartStickerView extends StickerView {
         boolean isTouchDown = super.onTouchDown(event);
         // show the corner icons
         if ( isTouchDown && !showIcons ) {
+            mHandler.removeCallbacksAndMessages(null);
             showIcons = true ;
             postInvalidate();
         }

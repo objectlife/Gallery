@@ -23,7 +23,6 @@
         android:visibility="gone"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_compose_video"
-    >
-    </ImageView>
+    />
 
 </FrameLayout>

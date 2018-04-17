@@ -132,7 +132,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
     private void initImageLoaders() {
 
-        DisplayImageOptions options = new DisplayImageOptions.Builder().bitmapConfig(Bitmap.Config.RGB_565).cacheInMemory(true).cacheOnDisk(true).build() ;
+        DisplayImageOptions options = new DisplayImageOptions.Builder().bitmapConfig(Bitmap.Config.RGB_565).showImageOnLoading(R.drawable.image_loading).cacheInMemory(true).cacheOnDisk(true).build() ;
 
         // DON'T COPY THIS CODE TO YOUR PROJECT! This is just example of ALL options using.
         // See the sample project how to use ImageLoader correctly.
@@ -235,7 +235,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                     + ", 2 : " + filePath + ", 3 : " + cursor.getString(2) + ", 4 : " + mediaType);
             mediaItems.add(MediaItem.create(id, mediaType, filePath)) ;
         }
-        mGalleryAdapter.addMedia(mediaItems);
+        mGalleryAdapter.addItems(mediaItems);
         cursor.close();
     }
 
