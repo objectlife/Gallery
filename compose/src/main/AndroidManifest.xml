@@ -15,5 +15,7 @@
         <activity android:name="com.weshare.CameraActivity" android:screenOrientation="portrait" android:theme="@style/FullScreenTheme"/>
         <activity android:name="com.weshare.ChooseCategoryActivity" android:screenOrientation="portrait" android:theme="@style/ToolBarTheme"/>
         <activity android:name="com.weshare.search.SearchTagActivity" android:screenOrientation="portrait" android:theme="@style/ToolBarTheme"/>
+        <activity android:name="com.weshare.ImageEditActivity" android:screenOrientation="portrait" android:theme="@style/ToolBarTheme"/>
+
     </application>
 </manifest>

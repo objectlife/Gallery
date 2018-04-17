@@ -31,7 +31,6 @@ import android.widget.Toast;
 
 import com.weshare.CameraActivity;
 import com.weshare.compose.BuildConfig;
-import com.weshare.compose.R;
 import com.weshare.utils.IOUtils;
 
 import java.io.BufferedOutputStream;
@@ -40,32 +39,30 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 
 /**
  * save picture task
  */
 public class SaveTask extends Thread {
 
-    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
+
 
     final WeakReference<CameraActivity> mActivityRef ;
     final Bitmap mBitmap ;
     private int mJpgQuality = 80 ;
+    private String fileName ;
 
-    public SaveTask(CameraActivity activity, Bitmap bitmap) {
-        this(activity, bitmap, 80);
+    public SaveTask(CameraActivity activity, Bitmap bitmap, String fileName) {
+        this(activity, bitmap, 80, fileName);
     }
 
 
-    public SaveTask(CameraActivity activity, Bitmap bitmap, int quality) {
+    public SaveTask(CameraActivity activity, Bitmap bitmap, int quality, String fileName) {
         mActivityRef = new WeakReference<>(activity);
         mBitmap = bitmap ;
         mJpgQuality = quality;
+        this.fileName = fileName ;
     }
-
 
 
     @Override
@@ -74,17 +71,11 @@ public class SaveTask extends Thread {
         if ( activity == null || activity.isFinishing() ) {
             return;
         }
-
-        //create a file to write bitmap data
-        Date currentTime = Calendar.getInstance().getTime();
-        String fileName = activity.getString(R.string.app_name) + SIMPLE_DATE_FORMAT.format(currentTime) + ".jpg" ;
         final String filePath = bitmapToFile(mBitmap, fileName, mJpgQuality);
 
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                activity.destroyStickerDrawingCache();
-
                 if (TextUtils.isEmpty(filePath)) {
                     Toast.makeText(activity, "Save image file failed :(",
                             Toast.LENGTH_SHORT).show();

@@ -58,6 +58,8 @@ import com.weshare.domain.MediaItem;
 import com.weshare.tasks.SaveTask;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -136,21 +138,18 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         // See the sample project how to use ImageLoader correctly.
         File cacheDir = StorageUtils.getCacheDirectory(getApplicationContext());
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
-                .memoryCacheExtraOptions(480, 800) // default = device screen dimensions
-                .diskCacheExtraOptions(480, 800, null)
                 .threadPoolSize(3) // default
                 .threadPriority(Thread.NORM_PRIORITY - 2)       // default
-                .tasksProcessingOrder(QueueProcessingType.LIFO) // default
-                .denyCacheImageMultipleSizesInMemory()
+                .tasksProcessingOrder(QueueProcessingType.LIFO)
                 .memoryCache(new LruMemoryCache(2 * 1024 * 1024))
                 .memoryCacheSize(2 * 1024 * 1024)
-                .memoryCacheSizePercentage(13) // default
+                .memoryCacheSizePercentage(13)                  // default
                 .diskCache(new UnlimitedDiskCache(cacheDir)) // default
                 .diskCacheSize(50 * 1024 * 1024)
-                .diskCacheFileCount(100)
-                .diskCacheFileNameGenerator(new HashCodeFileNameGenerator()) // default
+                .diskCacheFileCount(200)
+                .diskCacheFileNameGenerator(new HashCodeFileNameGenerator())        // default
                 .imageDownloader(new BaseImageDownloader(getApplicationContext())) // default
-                .defaultDisplayImageOptions(options) // default
+                .defaultDisplayImageOptions(options)                                // default
                 .writeDebugLogs()
                 .build();
 
@@ -191,6 +190,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Toast.makeText(CameraActivity.this, "click : " + mGalleryAdapter.getItem(position).path, Toast.LENGTH_SHORT).show();
+                ImageEditActivity.start(CameraActivity.this, mGalleryAdapter.getItem(position).path);
             }
         });
         // init loader
@@ -396,43 +396,25 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         flashButton.setImageResource(iconRes);
     }
 
+    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
+
     /**
      * 将拍照得到的照片添加到 sticker view 中的 ImageView中，然后再对整个 stickerView 进行截图，得到跟贴纸合并后的图像, 最后保存
      * @param bitmap
      */
     private void savePictureAsync(final Bitmap bitmap) {
-//        // display picture in the ImageView which in the StickerView
-        //        prevImageView.setImageBitmap(bitmap);
-        //        prevImageView.setVisibility(View.VISIBLE);
-        //
-        //        // build the drawing cache of StickerView
-        //        stickerView.setDrawingCacheEnabled(true);
-        //        stickerView.buildDrawingCache();
-        //
-        //        // obtain drawing cache of StickerView, the drawing cache has the picture
-        //        // and the stickers
-        //        final Bitmap combineBitmap = stickerView.getDrawingCache();
-        //
-        //        // clear the ImageView
-        //        prevImageView.setImageBitmap(null);
-        //        prevImageView.setVisibility(View.GONE);
+        ImageEditActivity.setPrevBitmap(bitmap);
+        String fileName = getString(R.string.app_name) + SIMPLE_DATE_FORMAT.format(Calendar.getInstance().getTime()) + ".jpg" ;
+        // 先跳转到编辑页面, 然后再保存, 避免保存太耗时导致等待时长偏长
+        ImageEditActivity.start(this, fileName);
 
+        mProgressBar.setVisibility(View.GONE);
         // save picture
-        new SaveTask(this, bitmap).start();
+        new SaveTask(this, bitmap, fileName).start();
     }
 
 
     public void onPictureTaken(String filePath) {
-        mProgressBar.setVisibility(View.GONE);
-        Intent result = new Intent() ;
-        result.setData(Uri.fromFile(new File(filePath)));
-        setResult(RESULT_OK, result);
-        finish();
-    }
-
-
-    public void destroyStickerDrawingCache() {
-//        stickerView.destroyDrawingCache();
-//        stickerView.setDrawingCacheEnabled(false);
+//        ImageEditActivity.start(this, filePath);
     }
 }
