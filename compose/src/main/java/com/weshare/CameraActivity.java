@@ -29,9 +29,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -52,7 +54,9 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
 import com.nostra13.universalimageloader.utils.StorageUtils;
+import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 import com.weshare.adapters.GalleryAdapter;
+import com.weshare.adapters.GalleryHeaderAdapter;
 import com.weshare.compose.R;
 import com.weshare.domain.MediaItem;
 import com.weshare.tasks.SaveTask;
@@ -80,6 +84,12 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     private RecyclerView mGalleryRecyclerView;
     private GalleryAdapter mGalleryAdapter;
 
+    private BottomSheetBehavior mBehavior;
+
+    private View mStickerLayout;
+    private View mGalleryContent;
+    private RecyclerView mGalleryContentView;
+    private GalleryHeaderAdapter mGalleryContentAdapter;
 
     public static void start(Context context) {
         Intent starter = new Intent(context, CameraActivity.class);
@@ -94,6 +104,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
         initCameraView();
         initGalleryRecyclerView();
+        initGalleryContentView();
         initActionLayout();
 
         mProgressBar = findViewById(R.id.camera_progress_bar) ;
@@ -104,6 +115,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                 Toast.makeText(CameraActivity.this, "swipe up", Toast.LENGTH_SHORT).show();
             }
         });
+        initBehavior();
     }
 
 
@@ -126,6 +138,22 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         flashButton.setOnClickListener(this);
 
         initImageLoaders();
+    }
+
+    private void initBehavior() {
+        mBehavior = BottomSheetBehavior.from(findViewById(R.id.design_bottom_sheet));
+        mBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                mStickerLayout.setAlpha(1 - slideOffset);
+                mGalleryContent.setAlpha(slideOffset);
+            }
+        });
     }
 
     private void initImageLoaders() {
@@ -179,8 +207,9 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void initGalleryRecyclerView() {
+        mStickerLayout = findViewById(R.id.layout_filter_tab);
         mGalleryRecyclerView = findViewById(R.id.effect_recyclerView);
-
+        mGalleryRecyclerView.setNestedScrollingEnabled(false);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         mGalleryRecyclerView.setLayoutManager(layoutManager);
@@ -195,6 +224,28 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         });
         // init loader
         getSupportLoaderManager().initLoader(1, null, this) ;
+    }
+
+    private void initGalleryContentView() {
+        mGalleryContent = findViewById(R.id.gallery_content);
+        mGalleryContentView = findViewById(R.id.gallery_view);
+//        mGalleryContentView.setNestedScrollingEnabled(false);
+        GridLayoutManager manager = new GridLayoutManager(this, 3, GridLayoutManager.VERTICAL, false);
+        mGalleryContentView.setLayoutManager(manager);
+
+        mGalleryContentAdapter = new GalleryHeaderAdapter();
+        mGalleryContentAdapter.setOnFilterChangeListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(CameraActivity.this, "click : " + mGalleryContentAdapter.getItem(position).path, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        mGalleryContentView.setAdapter(mGalleryContentAdapter);
+
+        final StickyRecyclerHeadersDecoration headersDecoration = new StickyRecyclerHeadersDecoration(mGalleryContentAdapter);
+        mGalleryContentView.addItemDecoration(headersDecoration);
+
     }
 
 
@@ -236,6 +287,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             mediaItems.add(MediaItem.create(id, mediaType, filePath)) ;
         }
         mGalleryAdapter.addMedia(mediaItems);
+        mGalleryContentAdapter.addMedia(mediaItems);
         cursor.close();
     }
 
