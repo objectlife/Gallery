@@ -25,7 +25,7 @@
     <com.google.android.cameraview.CameraView
         android:id="@+id/camera_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:adjustViewBounds="true"
         android:background="#232323"
         android:keepScreenOn="true"
@@ -33,35 +33,6 @@
         app:cameraAspectRatio="4:3"
         app:facing="back"
         app:flash="off"/>
-
-
-    <!--生成合成图的视图-->
-    <com.weshare.widgets.SmartStickerView
-        android:id="@+id/sticker_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        app:showIcons="true"
-    >
-
-        <ImageView
-            android:id="@+id/prev_imageview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="fitXY"/>
-
-    </com.weshare.widgets.SmartStickerView>
-
-
-    <ImageButton
-        android:id="@+id/close_btn"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="15dp"
-        android:background="@null"
-        android:src="@drawable/close_icon"
-    />
 
 
     <ProgressBar android:id="@+id/camera_progress_bar" style="@style/Widget.AppCompat.ProgressBar"
@@ -75,17 +46,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@android:color/white"
+        android:layout_marginBottom="48dp"
         android:gravity="center">
 
         <android.support.v7.widget.AppCompatImageView
-            android:id="@+id/stickers_btn"
+            android:id="@+id/flash_btn"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_marginLeft="48dp"
-            app:srcCompat="@drawable/sticker_icon"
+            android:src="@drawable/flash_auto"
         />
 
         <Button
@@ -108,16 +79,6 @@
         />
 
     </RelativeLayout>
-
-
-    <!--贴纸和滤镜 layout-->
-    <include
-        android:id="@+id/stickers_layout"
-        layout="@layout/sticker_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:visibility="invisible"/>
 
     <View
         android:id="@+id/shutter_effect"

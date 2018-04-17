@@ -20,22 +20,15 @@ package com.weshare;
 import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -43,9 +36,7 @@ import android.widget.Toast;
 import com.google.android.cameraview.CameraView;
 import com.google.android.cameraview.CameraViewImpl;
 import com.weshare.compose.R;
-import com.weshare.effect.FilterAdapter;
 import com.weshare.tasks.SaveTask;
-import com.xiaopo.flying.sticker.DrawableSticker;
 
 import java.io.File;
 
@@ -65,12 +56,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     com.xiaopo.flying.sticker.StickerView stickerView;
     ImageView prevImageView;
     View actionLayout;
-    private View flashButton;
-
-    private int cameraHeight;
-    private View mEffectLayout;
-    private RecyclerView mEffectRecyclerView;
-    FilterAdapter mFilterAdapter;
+    private ImageView flashButton;
     private boolean isTakingPhoto = false;
     ProgressBar mProgressBar ;
 
@@ -86,11 +72,10 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
 
-        cameraHeight = (int) (getResources().getDisplayMetrics().widthPixels * 4.0f / 3);
+//        cameraHeight = (int) (getResources().getDisplayMetrics().widthPixels * 4.0f / 3);
 
         initCameraView();
-        initStickerLayout();
-        initEffectRecyclerView();
+//        initStickerLayout();
         initActionLayout();
 
         mProgressBar = findViewById(R.id.camera_progress_bar) ;
@@ -99,52 +84,52 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
     private void initCameraView() {
         cameraView = findViewById(R.id.camera_view);
-        ViewGroup.LayoutParams params = cameraView.getLayoutParams();
-        if (params != null) {
-            params.width = getResources().getDisplayMetrics().widthPixels;
-            params.height = cameraHeight;
-            cameraView.setLayoutParams(params);
-        }
+//        ViewGroup.LayoutParams params = cameraView.getLayoutParams();
+//        if (params != null) {
+//            params.width = getResources().getDisplayMetrics().widthPixels;
+//            params.height = cameraHeight;
+//            cameraView.setLayoutParams(params);
+//        }
 
         shutterEffect = findViewById(R.id.shutter_effect);
 
-        ViewGroup.LayoutParams shutterEffectLayoutParams = shutterEffect.getLayoutParams();
-        if (shutterEffectLayoutParams != null) {
-            shutterEffectLayoutParams.width = getResources().getDisplayMetrics().widthPixels;
-            shutterEffectLayoutParams.height = cameraHeight;
-            shutterEffect.setLayoutParams(shutterEffectLayoutParams);
-        }
+//        ViewGroup.LayoutParams shutterEffectLayoutParams = shutterEffect.getLayoutParams();
+//        if (shutterEffectLayoutParams != null) {
+//            shutterEffectLayoutParams.width = getResources().getDisplayMetrics().widthPixels;
+//            shutterEffectLayoutParams.height = cameraHeight;
+//            shutterEffect.setLayoutParams(shutterEffectLayoutParams);
+//        }
     }
 
-    private void initStickerLayout() {
-        stickerView = findViewById(R.id.sticker_view);
-        ViewGroup.LayoutParams params = stickerView.getLayoutParams();
-        if (params != null) {
-            params.height = cameraHeight;
-            stickerView.setLayoutParams(params);
-        }
-
-        prevImageView = findViewById(R.id.prev_imageview);
-        ViewGroup.LayoutParams prevParams = prevImageView.getLayoutParams();
-        if (prevParams != null) {
-            prevParams.height = cameraHeight;
-            prevImageView.setLayoutParams(prevParams);
-        }
-    }
-
-    private int getBottomActionLayoutHeight() {
-        return getResources().getDisplayMetrics().heightPixels - cameraHeight;
-    }
+//    private void initStickerLayout() {
+//        stickerView = findViewById(R.id.sticker_view);
+//        ViewGroup.LayoutParams params = stickerView.getLayoutParams();
+//        if (params != null) {
+//            params.height = cameraHeight;
+//            stickerView.setLayoutParams(params);
+//        }
+//
+//        prevImageView = findViewById(R.id.prev_imageview);
+//        ViewGroup.LayoutParams prevParams = prevImageView.getLayoutParams();
+//        if (prevParams != null) {
+//            prevParams.height = cameraHeight;
+//            prevImageView.setLayoutParams(prevParams);
+//        }
+//    }
+//
+//    private int getBottomActionLayoutHeight() {
+//        return getResources().getDisplayMetrics().heightPixels - cameraHeight;
+//    }
 
 
     private void initActionLayout() {
         actionLayout = findViewById(R.id.bottom_layout);
-        ViewGroup.LayoutParams params = actionLayout.getLayoutParams();
-        if (params != null) {
-            params.width = getResources().getDisplayMetrics().widthPixels;
-            params.height = getBottomActionLayoutHeight();
-            actionLayout.setLayoutParams(params);
-        }
+//        ViewGroup.LayoutParams params = actionLayout.getLayoutParams();
+//        if (params != null) {
+//            params.width = getResources().getDisplayMetrics().widthPixels;
+//            params.height = getBottomActionLayoutHeight();
+//            actionLayout.setLayoutParams(params);
+//        }
 
         captureButton = findViewById(R.id.take_photo_btn);
         captureButton.setOnClickListener(this);
@@ -152,11 +137,8 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         switchButton = findViewById(R.id.switch_camera_btn);
         switchButton.setOnClickListener(this);
 
-        flashButton = findViewById(R.id.stickers_btn);
+        flashButton = findViewById(R.id.flash_btn);
         flashButton.setOnClickListener(this);
-
-
-        findViewById(R.id.close_btn).setOnClickListener(this);
     }
 
 
@@ -175,48 +157,44 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             cameraView.switchCamera();
         }
 
-        if ( viewId == R.id.stickers_btn ) {
-            showFilters();
-        }
-
-        if ( viewId == R.id.close_btn ) {
-            finish();
+        if ( viewId == R.id.flash_btn) {
+            switchFlashMode();
         }
     }
 
-    private void initEffectRecyclerView() {
-        mEffectLayout = findViewById(R.id.stickers_layout);
-
-        ViewGroup.LayoutParams params = mEffectLayout.getLayoutParams();
-        if (params != null) {
-            params.height = getBottomActionLayoutHeight();
-            mEffectLayout.setLayoutParams(params);
-        }
-
-        mEffectRecyclerView = findViewById(R.id.effect_recyclerView);
-
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        mEffectRecyclerView.setLayoutManager(layoutManager);
-
-        mFilterAdapter = new FilterAdapter(this, new String[]{"flower", "smile", "glassed"});
-        mFilterAdapter.setOnFilterChangeListener(new FilterAdapter.onFilterChangeListener() {
-            @Override
-            public void onFilterChanged(String filterType, int position) {
-                addSticker(position);
-                hideFilters();
-            }
-        });
-
-        mEffectRecyclerView.setAdapter(mFilterAdapter);
-
-        findViewById(R.id.btn_camera_closefilter).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideFilters();
-            }
-        });
-    }
+//    private void initEffectRecyclerView() {
+//        mEffectLayout = findViewById(R.id.stickers_layout);
+//
+//        ViewGroup.LayoutParams params = mEffectLayout.getLayoutParams();
+//        if (params != null) {
+//            params.height = getBottomActionLayoutHeight();
+//            mEffectLayout.setLayoutParams(params);
+//        }
+//
+//        mEffectRecyclerView = findViewById(R.id.effect_recyclerView);
+//
+//        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+//        layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+//        mEffectRecyclerView.setLayoutManager(layoutManager);
+//
+//        mFilterAdapter = new FilterAdapter(this, new String[]{"flower", "smile", "glassed"});
+//        mFilterAdapter.setOnFilterChangeListener(new FilterAdapter.onFilterChangeListener() {
+//            @Override
+//            public void onFilterChanged(String filterType, int position) {
+//                addSticker(position);
+//                hideFilters();
+//            }
+//        });
+//
+//        mEffectRecyclerView.setAdapter(mFilterAdapter);
+//
+//        findViewById(R.id.btn_camera_closefilter).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                hideFilters();
+//            }
+//        });
+//    }
 
 
 
@@ -307,65 +285,93 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     }
 
 
-    private void addSticker(int position) {
-        Bitmap stickerBitmap = null;
-        switch (position) {
-            case 0:
-                stickerBitmap = BitmapFactory.decodeResource(getResources(),
-                        R.drawable.pink_flower);
+//    private void addSticker(int position) {
+//        Bitmap stickerBitmap = null;
+//        switch (position) {
+//            case 0:
+//                stickerBitmap = BitmapFactory.decodeResource(getResources(),
+//                        R.drawable.pink_flower);
+//                break;
+//            case 1:
+//                stickerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.messenger);
+//                break;
+//            case 2:
+//                stickerBitmap = BitmapFactory.decodeResource(getResources(),
+//                        R.drawable.blue_flower);
+//                break;
+//        }
+//
+//        if (stickerBitmap != null) {
+//            stickerView.addSticker(new DrawableSticker(new BitmapDrawable(stickerBitmap)));
+//        }
+//    }
+//
+//
+//    private void showFilters() {
+//        ObjectAnimator animator = ObjectAnimator.ofFloat(mEffectLayout, "translationY",
+//                mEffectLayout.getHeight(), 0);
+//        animator.setDuration(200);
+//        animator.addListener(new AnimatorListenerAdapter() {
+//
+//            @Override
+//            public void onAnimationStart(Animator animation) {
+//                captureButton.setClickable(false);
+//                mEffectLayout.setVisibility(View.VISIBLE);
+//            }
+//        });
+//        animator.start();
+//    }
+
+    private void switchFlashMode() {
+        int mode = cameraView.getFlash() ;
+        int iconRes;
+        switch ( mode ) {
+            case CameraView.FLASH_OFF:
+                mode = CameraView.FLASH_ON ;
+                iconRes = R.drawable.flash_on ;
                 break;
-            case 1:
-                stickerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.messenger);
+            case CameraView.FLASH_ON:
+                mode = CameraView.FLASH_AUTO ;
+                iconRes = R.drawable.flash_auto ;
                 break;
-            case 2:
-                stickerBitmap = BitmapFactory.decodeResource(getResources(),
-                        R.drawable.blue_flower);
+
+            case CameraView.FLASH_AUTO:
+                mode = CameraView.FLASH_OFF ;
+                iconRes = R.drawable.flash_off ;
+                break;
+
+            default :
+                mode = CameraView.FLASH_OFF ;
+                iconRes = R.drawable.flash_off ;
                 break;
         }
-
-        if (stickerBitmap != null) {
-            stickerView.addSticker(new DrawableSticker(new BitmapDrawable(stickerBitmap)));
-        }
+        cameraView.setFlash(mode);
+        flashButton.setImageResource(iconRes);
     }
 
 
-    private void showFilters() {
-        ObjectAnimator animator = ObjectAnimator.ofFloat(mEffectLayout, "translationY",
-                mEffectLayout.getHeight(), 0);
-        animator.setDuration(200);
-        animator.addListener(new AnimatorListenerAdapter() {
-
-            @Override
-            public void onAnimationStart(Animator animation) {
-                captureButton.setClickable(false);
-                mEffectLayout.setVisibility(View.VISIBLE);
-            }
-        });
-        animator.start();
-    }
-
-    private void hideFilters() {
-        ObjectAnimator animator = ObjectAnimator.ofFloat(mEffectLayout, "translationY", 0,
-                mEffectLayout.getHeight());
-        animator.setDuration(200);
-        animator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                hideEffectLayout();
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-                hideEffectLayout();
-            }
-
-            private void hideEffectLayout() {
-                mEffectLayout.setVisibility(View.INVISIBLE);
-                captureButton.setClickable(true);
-            }
-        });
-        animator.start();
-    }
+//    private void hideFilters() {
+//        ObjectAnimator animator = ObjectAnimator.ofFloat(mEffectLayout, "translationY", 0,
+//                mEffectLayout.getHeight());
+//        animator.setDuration(200);
+//        animator.addListener(new AnimatorListenerAdapter() {
+//            @Override
+//            public void onAnimationEnd(Animator animation) {
+//                hideEffectLayout();
+//            }
+//
+//            @Override
+//            public void onAnimationCancel(Animator animation) {
+//                hideEffectLayout();
+//            }
+//
+//            private void hideEffectLayout() {
+//                mEffectLayout.setVisibility(View.INVISIBLE);
+//                captureButton.setClickable(true);
+//            }
+//        });
+//        animator.start();
+//    }
 
 
     /**
@@ -373,24 +379,24 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
      * @param bitmap
      */
     private void savePictureAsync(final Bitmap bitmap) {
-        // display picture in the ImageView which in the StickerView
-        prevImageView.setImageBitmap(bitmap);
-        prevImageView.setVisibility(View.VISIBLE);
-
-        // build the drawing cache of StickerView
-        stickerView.setDrawingCacheEnabled(true);
-        stickerView.buildDrawingCache();
-
-        // obtain drawing cache of StickerView, the drawing cache has the picture
-        // and the stickers
-        final Bitmap combineBitmap = stickerView.getDrawingCache();
-
-        // clear the ImageView
-        prevImageView.setImageBitmap(null);
-        prevImageView.setVisibility(View.GONE);
+//        // display picture in the ImageView which in the StickerView
+        //        prevImageView.setImageBitmap(bitmap);
+        //        prevImageView.setVisibility(View.VISIBLE);
+        //
+        //        // build the drawing cache of StickerView
+        //        stickerView.setDrawingCacheEnabled(true);
+        //        stickerView.buildDrawingCache();
+        //
+        //        // obtain drawing cache of StickerView, the drawing cache has the picture
+        //        // and the stickers
+        //        final Bitmap combineBitmap = stickerView.getDrawingCache();
+        //
+        //        // clear the ImageView
+        //        prevImageView.setImageBitmap(null);
+        //        prevImageView.setVisibility(View.GONE);
 
         // save picture
-        new SaveTask(this, combineBitmap).start();
+        new SaveTask(this, bitmap).start();
     }
 
 
@@ -404,33 +410,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
 
     public void destroyStickerDrawingCache() {
-        stickerView.destroyDrawingCache();
-        stickerView.setDrawingCacheEnabled(false);
+//        stickerView.destroyDrawingCache();
+//        stickerView.setDrawingCacheEnabled(false);
     }
-
-
-    private boolean isStickerLayoutShowing() {
-        return mEffectLayout != null && mEffectLayout.isShown();
-    }
-
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK && isStickerLayoutShowing()) {
-            hideFilters();
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
-
-    @Override
-    public void onBackPressed() {
-        if (isStickerLayoutShowing()) {
-            hideFilters();
-            return;
-        }
-        super.onBackPressed();
-    }
-
 }
