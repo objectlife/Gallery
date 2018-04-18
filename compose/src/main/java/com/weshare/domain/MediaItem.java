@@ -8,9 +8,16 @@ import android.provider.MediaStore;
 
 public class MediaItem {
 
+    public static final int TYPE_HEADER = 0;
+    public static final int TYPE_ITEM = 1;
+
+
     public long id ;
     public int type ;
     public String path ;
+    public long date;
+
+    public int itemType;
 
     private MediaItem() {
     }
@@ -21,6 +28,18 @@ public class MediaItem {
         mediaItem.type = type;
         mediaItem.path = filePath ;
         return mediaItem ;
+    }
+
+    public static MediaItem create(long id, int type, String filePath, long date) {
+        MediaItem mediaItem = create(id, type, filePath);
+        mediaItem.date = date;
+        return mediaItem ;
+    }
+
+    public static MediaItem createHeaderItem(long date) {
+        MediaItem item = new MediaItem();
+        item.date = date;
+        return item;
     }
 
     public boolean isVideo() {
