@@ -301,7 +301,9 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         mGalleryGridAdapter.setOnFilterChangeListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(CameraActivity.this, "click : " + mGalleryGridAdapter.getItem(position).path, Toast.LENGTH_SHORT).show();
+                Toast.makeText(CameraActivity.this, "click grid : " + mGalleryGridAdapter.getItem(position).path, Toast.LENGTH_SHORT).show();
+
+                ImageEditActivity.start(CameraActivity.this, mGalleryGridAdapter.getItem(position).path);
             }
         });
 
@@ -546,8 +548,8 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if ( mGalleryGridLayout.isShown() && mBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED ) {
-            mBehavior.setHideable(true);
-            mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+//            mBehavior.setHideable(true);
+            mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             return true;
         }
         return super.onKeyDown(keyCode, event);
@@ -557,8 +559,8 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onBackPressed() {
         if ( mGalleryGridLayout.isShown() && mBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED ) {
-            mBehavior.setHideable(true);
-            mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+//            mBehavior.setHideable(true);
+            mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             return;
         }
         super.onBackPressed();
