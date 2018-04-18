@@ -101,6 +101,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     View mStickerRootLayout ;
     View mBottomSheetLayout ;
 
+    boolean isAnimating = false ;
 
     public static void start(Context context) {
         Intent starter = new Intent(context, CameraActivity.class);
@@ -145,10 +146,10 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         shutterEffect = findViewById(R.id.shutter_effect);
     }
 
-    boolean isAnimating = false ;
+
 
     private void hideBottomSheetLayout() {
-        if ( mBottomSheetLayout != null && !isAnimating ) {
+        if ( mBottomSheetLayout != null && !isAnimating && mGalleryLinearAdapter.getItemCount() > 0 ) {
             isAnimating = true ;
             mBottomSheetLayout.animate().translationX(-getResources().getDisplayMetrics().widthPixels).setInterpolator(new DecelerateInterpolator()).setListener(new AnimatorListenerAdapter() {
 
