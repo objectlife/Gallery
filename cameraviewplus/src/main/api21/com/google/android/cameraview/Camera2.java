@@ -907,7 +907,7 @@ class Camera2 extends CameraViewImpl {
 
     @Override
     void tapFocus(MotionEvent event, int viewWidth, int viewHeight) {
-        if (mManualFocusEngaged || mCameraInfo == null ) {
+        if (mManualFocusEngaged || mCameraInfo == null || mCaptureSession == null ) {
             Log.d(TAG, "Manual focus already engaged");
             return;
         }
