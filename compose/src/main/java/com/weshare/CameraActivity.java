@@ -32,9 +32,11 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -58,6 +60,7 @@ import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
 import com.nostra13.universalimageloader.utils.StorageUtils;
 import com.weshare.adapters.GalleryAdapter;
+import com.weshare.adapters.GalleryContentAdapter;
 import com.weshare.compose.R;
 import com.weshare.domain.MediaItem;
 import com.weshare.tasks.SaveTask;
@@ -84,9 +87,14 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     private ImageView flashButton;
     private boolean isTakingPhoto = false;
     ProgressBar mProgressBar ;
-    private RecyclerView mGalleryRecyclerView;
-    private GalleryAdapter mGalleryAdapter;
+    private RecyclerView mGalleryLinearView;
+    private GalleryAdapter mGalleryLinearAdapter;
 
+    private BottomSheetBehavior mBehavior;
+
+    private View mGalleryContent;
+    private RecyclerView mGalleryGridView;
+    private GalleryContentAdapter mGalleryGridAdapter;
 
     public static void start(Context context) {
         Intent starter = new Intent(context, CameraActivity.class);
@@ -101,6 +109,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
         initCameraView();
         initGalleryRecyclerView();
+        initGalleryContentView();
         initActionLayout();
 
         mProgressBar = findViewById(R.id.camera_progress_bar) ;
@@ -111,6 +120,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                 Toast.makeText(CameraActivity.this, "swipe up", Toast.LENGTH_SHORT).show();
             }
         });
+        initBehavior();
     }
 
 
@@ -138,10 +148,39 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         flashButton = findViewById(R.id.flash_btn);
         flashButton.setOnClickListener(this);
 
-        mStickerRootLayout = findViewById(R.id.sticker_root_layout) ;
-        mStickerRootLayout.setTranslationX(-getResources().getDisplayMetrics().widthPixels);
-
         initImageLoaders();
+    }
+
+    private void initBehavior() {
+        mBehavior = BottomSheetBehavior.from(findViewById(R.id.design_bottom_sheet));
+        mBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                switch (newState) {
+                    case BottomSheetBehavior.STATE_COLLAPSED:
+                        mGalleryContent.setVisibility(View.GONE);
+                        break;
+
+                    case BottomSheetBehavior.STATE_EXPANDED:
+                        mGalleryContent.setVisibility(View.VISIBLE);
+                        break;
+
+                    case BottomSheetBehavior.STATE_DRAGGING:
+                        mGalleryContent.setVisibility(View.VISIBLE);
+                        // todo :
+                        if ( mGalleryGridAdapter.getItemCount() <= 0 ) {
+                            mGalleryGridAdapter.addItems(mContentMediaItems);
+                        }
+                        break;
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                mStickerRootLayout.setAlpha(1 - slideOffset);
+                mGalleryContent.setAlpha(slideOffset);
+            }
+        });
     }
 
     private void initImageLoaders() {
@@ -192,23 +231,54 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void initGalleryRecyclerView() {
-        mGalleryRecyclerView = findViewById(R.id.effect_recyclerView);
+        mStickerRootLayout = findViewById(R.id.sticker_root_layout) ;
+        mStickerRootLayout.setTranslationX(-getResources().getDisplayMetrics().widthPixels);
 
+        mGalleryLinearView = findViewById(R.id.effect_recyclerView);
+        mGalleryLinearView.setNestedScrollingEnabled(false);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        mGalleryRecyclerView.setLayoutManager(layoutManager);
+        mGalleryLinearView.setLayoutManager(layoutManager);
 
-        mGalleryAdapter = new GalleryAdapter() ;
-        mGalleryRecyclerView.setAdapter(mGalleryAdapter);
-        mGalleryAdapter.setOnFilterChangeListener(new AdapterView.OnItemClickListener() {
+        mGalleryLinearAdapter = new GalleryAdapter() ;
+        mGalleryLinearView.setAdapter(mGalleryLinearAdapter);
+        mGalleryLinearAdapter.setOnFilterChangeListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(CameraActivity.this, "click : " + mGalleryAdapter.getItem(position).path, Toast.LENGTH_SHORT).show();
-                ImageEditActivity.start(CameraActivity.this, mGalleryAdapter.getItem(position).path);
+                Toast.makeText(CameraActivity.this, "click : " + mGalleryLinearAdapter.getItem(position).path, Toast.LENGTH_SHORT).show();
+                ImageEditActivity.start(CameraActivity.this, mGalleryLinearAdapter.getItem(position).path);
             }
         });
         // init loader
         getSupportLoaderManager().initLoader(1, null, this) ;
+    }
+
+    private void initGalleryContentView() {
+        mGalleryContent = findViewById(R.id.gallery_content);
+        mGalleryGridView = findViewById(R.id.gallery_view);
+//        mGalleryGridView.setNestedScrollingEnabled(false);
+        GridLayoutManager manager = new GridLayoutManager(this, 3, GridLayoutManager.VERTICAL, false);
+        mGalleryGridView.setLayoutManager(manager);
+        mGalleryGridAdapter = new GalleryContentAdapter();
+        mGalleryGridAdapter.setOnFilterChangeListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(CameraActivity.this, "click : " + mGalleryGridAdapter.getItem(position).path, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        mGalleryGridView.setAdapter(mGalleryGridAdapter);
+        manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                switch (mGalleryGridAdapter.getItemViewType(position)) {
+                    case MediaItem.TYPE_HEADER:
+                        return 3;
+                    default:
+                        return 1;
+                }
+            }
+        });
     }
 
 
@@ -239,19 +309,31 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
 
     Handler mHandler = new Handler(Looper.getMainLooper()) ;
+    final List<MediaItem> mContentMediaItems = new LinkedList<>() ;
 
     @Override
     public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor cursor) {
         final List<MediaItem> mediaItems = new LinkedList<>() ;
+
         try {
+            long dateIndex = 0;
             while (cursor.moveToNext()) {
+                long date = cursor.getLong(2);
+                if (date != dateIndex) {
+                    dateIndex = date;
+                    MediaItem headerItem = MediaItem.createHeaderItem(date);
+                    headerItem.type = MediaItem.TYPE_HEADER;
+                    mContentMediaItems.add(headerItem);
+                }
                 long id = cursor.getLong(0) ;
                 String filePath = cursor.getString(1) ;
                 int mediaType = cursor.getInt(3) ;
-
+                MediaItem item = MediaItem.create(id, mediaType, filePath, date);
+                item.type = MediaItem.TYPE_ITEM;
                 Log.e("ryze_photo", "### 1 media id : " + id
                         + ", 2 : " + filePath + ", 3 : " + cursor.getString(2) + ", 4 : " + mediaType);
-                mediaItems.add(MediaItem.create(id, mediaType, filePath)) ;
+                mediaItems.add(item) ;
+                mContentMediaItems.add(item);
             }
         } finally {
             if ( mediaItems.size() > 0 ) {
@@ -260,7 +342,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                     public void run() {
                         mStickerRootLayout.setVisibility(View.VISIBLE);
                         mStickerRootLayout.animate().translationX(0).setInterpolator(new AccelerateDecelerateInterpolator()).setDuration(600).start();
-                        mGalleryAdapter.addItems(mediaItems);
+                        mGalleryLinearAdapter.addItems(mediaItems);
                     }
                 }, 1000);
             }
@@ -363,43 +445,6 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                 });
     }
 
-
-//    private void addSticker(int position) {
-//        Bitmap stickerBitmap = null;
-//        switch (position) {
-//            case 0:
-//                stickerBitmap = BitmapFactory.decodeResource(getResources(),
-//                        R.drawable.pink_flower);
-//                break;
-//            case 1:
-//                stickerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.messenger);
-//                break;
-//            case 2:
-//                stickerBitmap = BitmapFactory.decodeResource(getResources(),
-//                        R.drawable.blue_flower);
-//                break;
-//        }
-//
-//        if (stickerBitmap != null) {
-//            stickerView.addSticker(new DrawableSticker(new BitmapDrawable(stickerBitmap)));
-//        }
-//    }
-//
-//
-//    private void showFilters() {
-//        ObjectAnimator animator = ObjectAnimator.ofFloat(mEffectLayout, "translationY",
-//                mEffectLayout.getHeight(), 0);
-//        animator.setDuration(200);
-//        animator.addListener(new AnimatorListenerAdapter() {
-//
-//            @Override
-//            public void onAnimationStart(Animator animation) {
-//                captureButton.setClickable(false);
-//                mEffectLayout.setVisibility(View.VISIBLE);
-//            }
-//        });
-//        animator.start();
-//    }
 
     private void switchFlashMode() {
         int mode = cameraView.getFlash() ;
