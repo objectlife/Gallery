@@ -27,6 +27,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
@@ -406,7 +407,8 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
      */
     private void savePictureAsync(final Bitmap bitmap) {
         ImageEditActivity.setPrevBitmap(bitmap);
-        String fileName = getString(R.string.app_name) + SIMPLE_DATE_FORMAT.format(Calendar.getInstance().getTime()) + ".jpg" ;
+        String fileName = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator
+                + getString(R.string.app_name) + SIMPLE_DATE_FORMAT.format(Calendar.getInstance().getTime()) + ".jpg" ;
         // 先跳转到编辑页面, 然后再保存, 避免保存太耗时导致等待时长偏长
         ImageEditActivity.start(this, fileName);
 

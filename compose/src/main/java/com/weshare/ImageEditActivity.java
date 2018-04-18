@@ -20,7 +20,6 @@ import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.theartofdev.edmodo.cropper.CropImage;
-import com.theartofdev.edmodo.cropper.CropImageView;
 import com.weshare.adapters.StickerAdapter;
 import com.weshare.compose.R;
 import com.weshare.domain.StickerItem;
@@ -104,11 +103,14 @@ public class ImageEditActivity extends AppCompatActivity {
         findViewById(R.id.toolbar_crop_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+//                d.a(b).a(0.0f).a((int) R.drawable.ic_tick_white_24dp).a(this.mActivity);
                 // 拿到图片之后先裁剪.
                 CropImage.activity(Uri.fromFile(new File(filePath)))
                         .setCropMenuCropButtonIcon(R.drawable.ic_check_box_green_24dp)
-                        .setScaleType(CropImageView.ScaleType.CENTER_INSIDE)
+//                        .setScaleType(CropImageView.ScaleType.CENTER_INSIDE)
                         .setAutoZoomEnabled(false)
+                        .setInitialCropWindowPaddingRatio(0.0f)
                         .start(ImageEditActivity.this);
             }
         });

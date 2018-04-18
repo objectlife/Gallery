@@ -25,7 +25,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Environment;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -91,9 +90,7 @@ public class SaveTask extends Thread {
 
 
     private static String bitmapToFile(Bitmap bitmap, String fileName, int quality) {
-        File file = new File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
-                fileName);
+        File file = new File(fileName);
         try {
             file.createNewFile();
         } catch (Exception e) {
