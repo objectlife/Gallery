@@ -19,6 +19,7 @@ package com.google.android.cameraview;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -38,34 +39,52 @@ import java.util.Set;
 
 public class CameraView extends FrameLayout {
 
-    /** The camera device faces the opposite direction as the device's screen. */
+    /**
+     * The camera device faces the opposite direction as the device's screen.
+     */
     public static final int FACING_BACK = Constants.FACING_BACK;
 
-    /** The camera device faces the same direction as the device's screen. */
+    /**
+     * The camera device faces the same direction as the device's screen.
+     */
     public static final int FACING_FRONT = Constants.FACING_FRONT;
 
-    /** Direction the camera faces relative to device screen. */
+    /**
+     * Direction the camera faces relative to device screen.
+     */
     @IntDef({FACING_BACK, FACING_FRONT})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Facing {
     }
 
-    /** Flash will not be fired. */
+    /**
+     * Flash will not be fired.
+     */
     public static final int FLASH_OFF = Constants.FLASH_OFF;
 
-    /** Flash will always be fired during snapshot. */
+    /**
+     * Flash will always be fired during snapshot.
+     */
     public static final int FLASH_ON = Constants.FLASH_ON;
 
-    /** Constant emission of light during preview, auto-focus and snapshot. */
+    /**
+     * Constant emission of light during preview, auto-focus and snapshot.
+     */
     public static final int FLASH_TORCH = Constants.FLASH_TORCH;
 
-    /** Flash will be fired automatically when required. */
+    /**
+     * Flash will be fired automatically when required.
+     */
     public static final int FLASH_AUTO = Constants.FLASH_AUTO;
 
-    /** Flash will be fired in red-eye reduction mode. */
+    /**
+     * Flash will be fired in red-eye reduction mode.
+     */
     public static final int FLASH_RED_EYE = Constants.FLASH_RED_EYE;
 
-    /** The mode for for the camera device's flash control */
+    /**
+     * The mode for for the camera device's flash control
+     */
     @IntDef({FLASH_OFF, FLASH_ON, FLASH_TORCH, FLASH_AUTO, FLASH_RED_EYE})
     public @interface Flash {
     }
@@ -75,6 +94,8 @@ public class CameraView extends FrameLayout {
     private boolean mAdjustViewBounds;
 
     private final DisplayOrientationDetector mDisplayOrientationDetector;
+
+    FocusView mFocusView;
 
     public CameraView(Context context) {
         this(context, null);
@@ -87,7 +108,7 @@ public class CameraView extends FrameLayout {
     @SuppressWarnings("WrongConstant")
     public CameraView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        if (isInEditMode()){
+        if (isInEditMode()) {
             mDisplayOrientationDetector = null;
             return;
         }
@@ -101,8 +122,8 @@ public class CameraView extends FrameLayout {
             mImpl = new Camera2Api23(preview, context);
         }
         // Attributes
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CameraView, defStyleAttr,
-                R.style.Widget_CameraView);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CameraView, defStyleAttr, R.style
+                .Widget_CameraView);
         mAdjustViewBounds = a.getBoolean(R.styleable.CameraView_android_adjustViewBounds, false);
         setFacing(a.getInt(R.styleable.CameraView_facing, FACING_BACK));
         String aspectRatio = a.getString(R.styleable.CameraView_cameraAspectRatio);
@@ -152,7 +173,7 @@ public class CameraView extends FrameLayout {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        if (isInEditMode()){
+        if (isInEditMode()) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
             return;
         }
@@ -171,8 +192,7 @@ public class CameraView extends FrameLayout {
                 if (heightMode == MeasureSpec.AT_MOST) {
                     height = Math.min(height, MeasureSpec.getSize(heightMeasureSpec));
                 }
-                super.onMeasure(widthMeasureSpec,
-                        MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY));
+                super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY));
             } else if (widthMode != MeasureSpec.EXACTLY && heightMode == MeasureSpec.EXACTLY) {
                 final AspectRatio ratio = getAspectRatio();
                 assert ratio != null;
@@ -180,8 +200,7 @@ public class CameraView extends FrameLayout {
                 if (widthMode == MeasureSpec.AT_MOST) {
                     width = Math.min(width, MeasureSpec.getSize(widthMeasureSpec));
                 }
-                super.onMeasure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
-                        heightMeasureSpec);
+                super.onMeasure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), heightMeasureSpec);
             } else {
                 super.onMeasure(widthMeasureSpec, heightMeasureSpec);
             }
@@ -197,33 +216,54 @@ public class CameraView extends FrameLayout {
         }
         assert ratio != null;
         if (height < width * ratio.getY() / ratio.getX()) {
-            mImpl.getView().measure(
-                    MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(width * ratio.getY() / ratio.getX(),
-                            MeasureSpec.EXACTLY));
+            mImpl.getView().measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec
+                    .makeMeasureSpec(width * ratio.getY() / ratio.getX(), MeasureSpec.EXACTLY));
         } else {
-            mImpl.getView().measure(
-                    MeasureSpec.makeMeasureSpec(height * ratio.getX() / ratio.getY(),
-                            MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY));
+            mImpl.getView().measure(MeasureSpec.makeMeasureSpec(height * ratio.getX() / ratio.getY(), MeasureSpec
+                    .EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY));
         }
     }
 
     //Handle Pinch Zoom
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (mImpl == null) return super.onTouchEvent(event);
+        if (mImpl == null)
+            return super.onTouchEvent(event);
 
         int action = event.getActionMasked();
-        if (event.getPointerCount() == 2) { //Multi touch.
+        int touchCount = event.getPointerCount() ;
+        if ( touchCount == 2) { //Multi touch.
             if (action == MotionEvent.ACTION_POINTER_UP || action == MotionEvent.ACTION_UP) {
                 mImpl.onPinchFingerUp();
             } else {
                 mImpl.zoom(event);
             }
             return true;
-        } else { //Single touch point, needs to return true in order to detect one more touch point
+        } else {
+            // tap to focus
+            if ( action == MotionEvent.ACTION_DOWN ) {
+                tapToFocus(event);
+            }
+            //Single touch point, needs to return true in order to detect one more touch point
             return true;
+        }
+    }
+
+    public void setFocusView(FocusView view) {
+        this.mFocusView = view;
+    }
+
+    private void tapToFocus(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            float x = event.getX();
+            float y = event.getY();
+            Rect touchRect = new Rect((int) (x - 100), (int) (y - 100), (int) (x + 100), (int) (y + 100));
+            mImpl.tapFocus(event, this.getWidth(), this.getHeight());
+
+            if (mFocusView != null) {
+                mFocusView.setHaveTouch(true, touchRect);
+                mFocusView.invalidate();
+            }
         }
     }
 
@@ -258,7 +298,7 @@ public class CameraView extends FrameLayout {
     public void start() {
         if (!mImpl.start()) {
             //store the state ,and restore this state after fall back o Camera1
-            Parcelable state=onSaveInstanceState();
+            Parcelable state = onSaveInstanceState();
             // Camera2 uses legacy hardware layer; fall back to Camera1
             mImpl = new Camera1(createPreviewImpl(getContext()));
             onRestoreInstanceState(state);
@@ -315,7 +355,7 @@ public class CameraView extends FrameLayout {
     /**
      * A more user-friendly version of setFacing.
      */
-    public void switchCamera () {
+    public void switchCamera() {
         if (getFacing() == FACING_BACK) {
             setFacing(FACING_FRONT);
         } else {
@@ -403,25 +443,25 @@ public class CameraView extends FrameLayout {
         return mImpl.getFlash();
     }
 
-    public void setOnPictureTakenListener (CameraViewImpl.OnPictureTakenListener pictureTakenListener) {
+    public void setOnPictureTakenListener(CameraViewImpl.OnPictureTakenListener pictureTakenListener) {
         if (mImpl != null) {
             mImpl.setOnPictureTakenListener(pictureTakenListener);
         }
     }
 
-    public void setOnFocusLockedListener (CameraViewImpl.OnFocusLockedListener focusLockedListener) {
+    public void setOnFocusLockedListener(CameraViewImpl.OnFocusLockedListener focusLockedListener) {
         if (mImpl != null) {
             mImpl.setOnFocusLockedListener(focusLockedListener);
         }
     }
 
-    public void setOnTurnCameraFailListener (CameraViewImpl.OnTurnCameraFailListener turnCameraFailListener) {
+    public void setOnTurnCameraFailListener(CameraViewImpl.OnTurnCameraFailListener turnCameraFailListener) {
         if (mImpl != null) {
             mImpl.setOnTurnCameraFailListener(turnCameraFailListener);
         }
     }
 
-    public void setOnCameraErrorListener (CameraViewImpl.OnCameraErrorListener cameraErrorListener) {
+    public void setOnCameraErrorListener(CameraViewImpl.OnCameraErrorListener cameraErrorListener) {
         if (mImpl != null) {
             mImpl.setOnCameraErrorListener(cameraErrorListener);
         }
@@ -431,7 +471,7 @@ public class CameraView extends FrameLayout {
         mImpl.takePicture();
     }
 
-    public void setPixelsPerOneZoomLevel (int pixels) {
+    public void setPixelsPerOneZoomLevel(int pixels) {
         if (mImpl != null) {
             mImpl.setPixelsPerOneZoomLevel(pixels);
         }
@@ -471,8 +511,7 @@ public class CameraView extends FrameLayout {
             out.writeInt(flash);
         }
 
-        public static final Parcelable.Creator<SavedState> CREATOR
-                = ParcelableCompat.newCreator(new ParcelableCompatCreatorCallbacks<SavedState>() {
+        public static final Parcelable.Creator<SavedState> CREATOR = ParcelableCompat.newCreator(new ParcelableCompatCreatorCallbacks<SavedState>() {
 
             @Override
             public SavedState createFromParcel(Parcel in, ClassLoader loader) {

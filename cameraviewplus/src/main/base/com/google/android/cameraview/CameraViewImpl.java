@@ -118,6 +118,8 @@ public abstract class CameraViewImpl {
 
     abstract void onPinchFingerUp ();
 
+    abstract void tapFocus(MotionEvent event, int viewWidth, int viewHeight) ;
+
     protected float getFingerSpacing(MotionEvent event) {
         float x = event.getX(0) - event.getX(1);
         float y = event.getY(0) - event.getY(1);

@@ -44,6 +44,7 @@ import android.widget.Toast;
 
 import com.google.android.cameraview.CameraView;
 import com.google.android.cameraview.CameraViewImpl;
+import com.google.android.cameraview.FocusView;
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
 import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
 import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
@@ -113,6 +114,8 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     private void initCameraView() {
         cameraView = findViewById(R.id.camera_view);
         cameraView.setFlash(CameraView.FLASH_AUTO);
+        FocusView view = findViewById(R.id.focus_view) ;
+        cameraView.setFocusView(view);
 
         shutterEffect = findViewById(R.id.shutter_effect);
     }

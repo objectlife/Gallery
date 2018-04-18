@@ -17,13 +17,16 @@
 package com.google.android.cameraview;
 
 import android.annotation.SuppressLint;
+import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.os.Build;
 import android.support.v4.util.SparseArrayCompat;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -622,4 +625,32 @@ class Camera1 extends CameraViewImpl {
         mZoomDistance = null; //Reset zoom memory if finger is up
     }
 
+
+    @Override
+    void tapFocus(MotionEvent event, int viewWidth, int viewHeight) {
+        float x = event.getX();
+        float y = event.getY();
+
+        Rect touchRect = new Rect((int) (x - 100), (int) (y - 100), (int) (x + 100), (int) (y + 100));
+
+        final Rect targetFocusRect = new Rect(touchRect.left * 2000 / viewWidth - 1000, touchRect.top *
+                2000 / viewHeight - 1000, touchRect.right * 2000 / viewWidth - 1000, touchRect.bottom
+                * 2000 / viewHeight - 1000);
+        try {
+            final List<Camera.Area> focusList = new ArrayList<Camera.Area>();
+            Camera.Area focusArea = new Camera.Area(targetFocusRect, 1000);
+            focusList.add(focusArea);
+
+            Camera.Parameters para = mCamera.getParameters();
+            para.setFocusAreas(focusList);
+            para.setMeteringAreas(focusList);
+            mCamera.setParameters(para);
+
+            // focus
+            mCamera.autoFocus(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.i("", "Unable to autofocus");
+        }
+    }
 }
