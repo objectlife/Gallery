@@ -912,6 +912,7 @@ class Camera2 extends CameraViewImpl {
             return;
         }
 
+        mAutoFocus = false ;
         final Rect sensorArraySize = mCameraInfo.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
 
         // TODO: here I just flip x,y, but this needs to correspond with the sensor orientation (via SENSOR_ORIENTATION)
@@ -972,7 +973,6 @@ class Camera2 extends CameraViewImpl {
             //then we ask for a single request (not repeating!)
             mCaptureSession.capture(mPreviewRequestBuilder.build(), captureCallbackHandler, null);
             mManualFocusEngaged = true;
-
         } catch (CameraAccessException e) {
             e.printStackTrace();
             mManualFocusEngaged = false;

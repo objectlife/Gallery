@@ -92,7 +92,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
     private BottomSheetBehavior mBehavior;
 
-    private View mGalleryContent;
+    private View mGalleryGridLayout;
     private RecyclerView mGalleryGridView;
     private GalleryContentAdapter mGalleryGridAdapter;
 
@@ -158,15 +158,15 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
                 switch (newState) {
                     case BottomSheetBehavior.STATE_COLLAPSED:
-                        mGalleryContent.setVisibility(View.GONE);
+                        mGalleryGridLayout.setVisibility(View.GONE);
                         break;
 
                     case BottomSheetBehavior.STATE_EXPANDED:
-                        mGalleryContent.setVisibility(View.VISIBLE);
+                        mGalleryGridLayout.setVisibility(View.VISIBLE);
                         break;
 
                     case BottomSheetBehavior.STATE_DRAGGING:
-                        mGalleryContent.setVisibility(View.VISIBLE);
+                        mGalleryGridLayout.setVisibility(View.VISIBLE);
                         // todo :
                         if ( mGalleryGridAdapter.getItemCount() <= 0 ) {
                             mGalleryGridAdapter.addItems(mContentMediaItems);
@@ -177,8 +177,8 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                mStickerRootLayout.setAlpha(1 - slideOffset);
-                mGalleryContent.setAlpha(slideOffset);
+                mStickerRootLayout.setAlpha(1 - slideOffset - 0.3f);
+                mGalleryGridLayout.setAlpha(slideOffset);
             }
         });
     }
@@ -254,7 +254,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void initGalleryContentView() {
-        mGalleryContent = findViewById(R.id.gallery_content);
+        mGalleryGridLayout = findViewById(R.id.gallery_content);
         mGalleryGridView = findViewById(R.id.gallery_view);
 //        mGalleryGridView.setNestedScrollingEnabled(false);
         GridLayoutManager manager = new GridLayoutManager(this, 3, GridLayoutManager.VERTICAL, false);
