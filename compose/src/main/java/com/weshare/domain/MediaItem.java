@@ -15,6 +15,7 @@ public class MediaItem {
     public int type ;
     public String path ;
     public String headerDate;
+    public int itemType;
 
     private MediaItem() {
     }

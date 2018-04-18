@@ -20,13 +20,13 @@ public class GalleryGridAdapter extends GalleryAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return getItem(position).type;
+        return getItem(position).itemType;
     }
 
     @Override
     public void onBindViewHolder(GalleryHolder holder, int position) {
         final MediaItem item = getItem(position);
-        if (item.type == MediaItem.TYPE_ITEM) {
+        if (item.itemType == MediaItem.TYPE_ITEM) {
             super.onBindViewHolder(holder, position);
             if (holder != null) {
                 if (mImageViewSize == -1) {
@@ -39,7 +39,7 @@ public class GalleryGridAdapter extends GalleryAdapter {
                 params.height = mImageViewSize;
                 holder.imageView.setLayoutParams(params);
             }
-        } else if (item.type == MediaItem.TYPE_HEADER) {
+        } else if (item.itemType == MediaItem.TYPE_HEADER) {
             holder.textView.setText(String.valueOf(item.headerDate));
         }
     }

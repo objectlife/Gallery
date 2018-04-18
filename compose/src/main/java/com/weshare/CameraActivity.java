@@ -39,6 +39,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -47,6 +48,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.cameraview.CameraView;
@@ -116,7 +118,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
         initCameraView();
         initGalleryRecyclerView();
-        initGalleryContentView();
+        initGalleryGridView();
         initActionLayout();
 
         mProgressBar = findViewById(R.id.camera_progress_bar) ;
@@ -291,11 +293,10 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         getSupportLoaderManager().initLoader(1, null, this) ;
     }
 
-    private void initGalleryContentView() {
+    private void initGalleryGridView() {
         mGalleryGridLayout = findViewById(R.id.gallery_content);
         mGalleryGridView = findViewById(R.id.gallery_view);
-//        mGalleryGridView.setNestedScrollingEnabled(false);
-        GridLayoutManager manager = new GridLayoutManager(this, 3, GridLayoutManager.VERTICAL, false);
+        final GridLayoutManager manager = new GridLayoutManager(this, 3, GridLayoutManager.VERTICAL, false);
         mGalleryGridView.setLayoutManager(manager);
         mGalleryGridAdapter = new GalleryGridAdapter();
         mGalleryGridAdapter.setOnFilterChangeListener(new AdapterView.OnItemClickListener() {
@@ -316,6 +317,27 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                         return 3;
                     default:
                         return 1;
+                }
+            }
+        });
+        final TextView headerText = findViewById(R.id.tv_header_date);
+        mGalleryGridView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                final int firstPosition = manager.findFirstVisibleItemPosition();
+                final String headerDate = mGalleryGridAdapter.getItem(firstPosition).headerDate;
+                if (!TextUtils.isEmpty(headerDate)) {
+                    headerText.setText(headerDate);
+                }
+            }
+        });
+
+        findViewById(R.id.btn_close).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mBehavior != null) {
+                    mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 }
             }
         });
@@ -363,24 +385,27 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             while (cursor.moveToNext()) {
                 long date = cursor.getLong(2);
                 long offset = nowTimestamp - date ;
+                String dateTitle = "";
                 if ( offset  <= 3 * DAY_SECONDS && headerItem == null ) {
-                    headerItem = MediaItem.createHeaderItem("最近");
-                    headerItem.type = MediaItem.TYPE_HEADER;
+                    dateTitle = "最近";
+                    headerItem = MediaItem.createHeaderItem(dateTitle);
+                    headerItem.itemType = MediaItem.TYPE_HEADER;
                     mContentMediaItems.add(headerItem);
                 } else if ( offset  > 3 * DAY_SECONDS && othersHeaderItem == null ){
-                    othersHeaderItem = MediaItem.createHeaderItem("3天之前");
-                    othersHeaderItem.type = MediaItem.TYPE_HEADER;
+                    dateTitle = "3天之前";
+                    othersHeaderItem = MediaItem.createHeaderItem(dateTitle);
+                    othersHeaderItem.itemType = MediaItem.TYPE_HEADER;
                     mContentMediaItems.add(othersHeaderItem);
                 }
-
                 long id = cursor.getLong(0) ;
                 String filePath = cursor.getString(1) ;
                 int mediaType = cursor.getInt(3) ;
                 MediaItem item = MediaItem.create(id, mediaType, filePath);
-                item.type = MediaItem.TYPE_ITEM;
+                item.itemType= MediaItem.TYPE_ITEM;
                 Log.e("ryze_photo", "### 1 media id : " + id
                         + ", 2 : " + filePath + ", 3 : " + cursor.getString(2) + ", 4 : " + mediaType);
                 mediaItems.add(item) ;
+                item.headerDate = dateTitle;
                 mContentMediaItems.add(item);
             }
         } finally {
