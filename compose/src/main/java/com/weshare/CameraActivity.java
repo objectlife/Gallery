@@ -60,7 +60,7 @@ import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
 import com.nostra13.universalimageloader.utils.StorageUtils;
 import com.weshare.adapters.GalleryAdapter;
-import com.weshare.adapters.GalleryContentAdapter;
+import com.weshare.adapters.GalleryGridAdapter;
 import com.weshare.compose.R;
 import com.weshare.domain.MediaItem;
 import com.weshare.tasks.SaveTask;
@@ -94,7 +94,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
     private View mGalleryGridLayout;
     private RecyclerView mGalleryGridView;
-    private GalleryContentAdapter mGalleryGridAdapter;
+    private GalleryGridAdapter mGalleryGridAdapter;
 
     public static void start(Context context) {
         Intent starter = new Intent(context, CameraActivity.class);
@@ -159,10 +159,15 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                 switch (newState) {
                     case BottomSheetBehavior.STATE_COLLAPSED:
                         mGalleryGridLayout.setVisibility(View.GONE);
+
+                        mStickerRootLayout.setAlpha(1.0f);
+                        actionLayout.setAlpha(1.0f);
                         break;
 
                     case BottomSheetBehavior.STATE_EXPANDED:
                         mGalleryGridLayout.setVisibility(View.VISIBLE);
+                        mStickerRootLayout.setAlpha(0.0f);
+                        actionLayout.setAlpha(0.0f);
                         break;
 
                     case BottomSheetBehavior.STATE_DRAGGING:
@@ -177,7 +182,9 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                mStickerRootLayout.setAlpha(1 - slideOffset - 0.3f);
+                float alpha =  Math.max(0, 1 - (slideOffset + 0.5f));
+                mStickerRootLayout.setAlpha(alpha);
+                actionLayout.setAlpha(alpha);
                 mGalleryGridLayout.setAlpha(slideOffset);
             }
         });
@@ -259,7 +266,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 //        mGalleryGridView.setNestedScrollingEnabled(false);
         GridLayoutManager manager = new GridLayoutManager(this, 3, GridLayoutManager.VERTICAL, false);
         mGalleryGridView.setLayoutManager(manager);
-        mGalleryGridAdapter = new GalleryContentAdapter();
+        mGalleryGridAdapter = new GalleryGridAdapter();
         mGalleryGridAdapter.setOnFilterChangeListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -311,24 +318,32 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     Handler mHandler = new Handler(Looper.getMainLooper()) ;
     final List<MediaItem> mContentMediaItems = new LinkedList<>() ;
 
+    public static final long DAY_SECONDS = 24 * 60 * 60 ;
+    MediaItem headerItem ;
+    MediaItem othersHeaderItem;
+
     @Override
     public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor cursor) {
         final List<MediaItem> mediaItems = new LinkedList<>() ;
-
+        long nowTimestamp = System.currentTimeMillis() / 1000 ;
         try {
-            long dateIndex = 0;
             while (cursor.moveToNext()) {
                 long date = cursor.getLong(2);
-                if (date != dateIndex) {
-                    dateIndex = date;
-                    MediaItem headerItem = MediaItem.createHeaderItem(date);
+                long offset = date - nowTimestamp ;
+                if ( offset  <= 3 * DAY_SECONDS && headerItem == null ) {
+                    headerItem = MediaItem.createHeaderItem("最近");
                     headerItem.type = MediaItem.TYPE_HEADER;
                     mContentMediaItems.add(headerItem);
+                } else if ( othersHeaderItem == null ){
+                    othersHeaderItem = MediaItem.createHeaderItem("3天之前");
+                    othersHeaderItem.type = MediaItem.TYPE_HEADER;
+                    mContentMediaItems.add(othersHeaderItem);
                 }
+
                 long id = cursor.getLong(0) ;
                 String filePath = cursor.getString(1) ;
                 int mediaType = cursor.getInt(3) ;
-                MediaItem item = MediaItem.create(id, mediaType, filePath, date);
+                MediaItem item = MediaItem.create(id, mediaType, filePath);
                 item.type = MediaItem.TYPE_ITEM;
                 Log.e("ryze_photo", "### 1 media id : " + id
                         + ", 2 : " + filePath + ", 3 : " + cursor.getString(2) + ", 4 : " + mediaType);

@@ -40,9 +40,12 @@ import java.util.List;
 
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryHolder> {
 
+    final DisplayImageOptions options = new DisplayImageOptions.Builder().bitmapConfig(Bitmap.Config.RGB_565).cacheInMemory
+            (true).cacheOnDisk(false).showImageOnLoading(R.drawable.image_loading).showImageOnFail(R.drawable
+            .category_item_bg).build();
+
     private final List<MediaItem> mediaItems = new LinkedList<>();
     private AdapterView.OnItemClickListener mOnItemClickListener;
-
 
     @Override
     public GalleryHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -50,9 +53,6 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryH
         return new GalleryHolder(view);
     }
 
-    final DisplayImageOptions options = new DisplayImageOptions.Builder().bitmapConfig(Bitmap.Config.RGB_565).cacheInMemory
-            (true).cacheOnDisk(false).showImageOnLoading(R.drawable.image_loading).showImageOnFail(R.drawable
-            .category_item_bg).build();
 
     @Override
     public void onBindViewHolder(GalleryHolder holder, final int position) {

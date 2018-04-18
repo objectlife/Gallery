@@ -13,7 +13,7 @@ import com.weshare.utils.DisplayUtil;
  * Created by objectlife on 2018/4/17.
  */
 
-public class GalleryContentAdapter extends GalleryAdapter {
+public class GalleryGridAdapter extends GalleryAdapter {
 
     private static final int NUM_COLUMNS = 3;
     private int mImageViewSize = -1;
@@ -40,7 +40,7 @@ public class GalleryContentAdapter extends GalleryAdapter {
                 holder.imageView.setLayoutParams(params);
             }
         } else if (item.type == MediaItem.TYPE_HEADER) {
-            holder.textView.setText(String.valueOf(item.date));
+            holder.textView.setText(String.valueOf(item.headerDate));
         }
     }
 

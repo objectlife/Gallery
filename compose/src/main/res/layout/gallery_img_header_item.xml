@@ -3,5 +3,6 @@
           android:id="@+id/tv_img_date"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
+          android:padding="15dp"
           android:text="Last Week">
 </TextView>
