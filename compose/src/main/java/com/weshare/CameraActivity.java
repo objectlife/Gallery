@@ -28,6 +28,8 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
@@ -37,6 +39,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -121,6 +124,8 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     }
 
 
+    View mStickerRootLayout ;
+
     private void initActionLayout() {
         actionLayout = findViewById(R.id.bottom_layout);
 
@@ -132,6 +137,9 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
         flashButton = findViewById(R.id.flash_btn);
         flashButton.setOnClickListener(this);
+
+        mStickerRootLayout = findViewById(R.id.sticker_root_layout) ;
+        mStickerRootLayout.setTranslationX(-getResources().getDisplayMetrics().widthPixels);
 
         initImageLoaders();
     }
@@ -229,21 +237,39 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         );
     }
 
+
+    Handler mHandler = new Handler(Looper.getMainLooper()) ;
+
     @Override
     public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor cursor) {
-        List<MediaItem> mediaItems = new LinkedList<>() ;
-        while (cursor.moveToNext()) {
-            long id = cursor.getLong(0) ;
-            String filePath = cursor.getString(1) ;
-            int mediaType = cursor.getInt(3) ;
+        final List<MediaItem> mediaItems = new LinkedList<>() ;
+        try {
+            while (cursor.moveToNext()) {
+                long id = cursor.getLong(0) ;
+                String filePath = cursor.getString(1) ;
+                int mediaType = cursor.getInt(3) ;
 
-            Log.e("ryze_photo", "### 1 media id : " + id
-                    + ", 2 : " + filePath + ", 3 : " + cursor.getString(2) + ", 4 : " + mediaType);
-            mediaItems.add(MediaItem.create(id, mediaType, filePath)) ;
+                Log.e("ryze_photo", "### 1 media id : " + id
+                        + ", 2 : " + filePath + ", 3 : " + cursor.getString(2) + ", 4 : " + mediaType);
+                mediaItems.add(MediaItem.create(id, mediaType, filePath)) ;
+            }
+        } finally {
+            if ( mediaItems.size() > 0 ) {
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mStickerRootLayout.setVisibility(View.VISIBLE);
+                        mStickerRootLayout.animate().translationX(0).setInterpolator(new AccelerateDecelerateInterpolator()).setDuration(600).start();
+                        mGalleryAdapter.addItems(mediaItems);
+                    }
+                }, 1000);
+            }
+            if ( cursor != null ) {
+                cursor.close();
+            }
         }
-        mGalleryAdapter.addItems(mediaItems);
-        cursor.close();
     }
+
 
     @Override
     public void onLoaderReset(android.support.v4.content.Loader<Cursor> loader) {
@@ -424,4 +450,12 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     public void onPictureTaken(String filePath) {
 //        ImageEditActivity.start(this, filePath);
     }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mHandler.removeCallbacksAndMessages(null);
+    }
+
 }
