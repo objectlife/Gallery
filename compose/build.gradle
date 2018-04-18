@@ -34,15 +34,13 @@ dependencies {
 
     implementation 'com.hyman:flowlayout-lib:1.1.2'
 
-    implementation 'com.timehop.stickyheadersrecyclerview:library:0.4.3@aar'
-
     implementation project(':cameraviewplus')
     implementation project(':stickerview')
+    implementation project(':sticky-headers-recyclerview')
 
 
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation ('com.theartofdev.edmodo:android-image-cropper:2.5.1')
-
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'

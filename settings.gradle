@@ -1,1 +1,1 @@
-include ':app', ':compose', ':cameraviewplus', ':stickerview'
+include ':app', ':compose', ':cameraviewplus', ':stickerview', ':sticky-headers-recyclerview'

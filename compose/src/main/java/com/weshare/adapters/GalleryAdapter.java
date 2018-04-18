@@ -27,6 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -109,11 +110,13 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryH
     static class GalleryHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
         ImageView typeImageView;
+        TextView textView;
 
         public GalleryHolder(View itemView) {
             super(itemView);
             this.imageView = itemView.findViewById(R.id.item_imageview);
-            typeImageView = itemView.findViewById(R.id.item_type_imageview);
+            this.typeImageView = itemView.findViewById(R.id.item_type_imageview);
+            this.textView = itemView.findViewById(R.id.tv_img_date);
         }
     }
 }

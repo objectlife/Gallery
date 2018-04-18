@@ -54,9 +54,8 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
 import com.nostra13.universalimageloader.utils.StorageUtils;
-import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 import com.weshare.adapters.GalleryAdapter;
-import com.weshare.adapters.GalleryHeaderAdapter;
+import com.weshare.adapters.GalleryContentAdapter;
 import com.weshare.compose.R;
 import com.weshare.domain.MediaItem;
 import com.weshare.tasks.SaveTask;
@@ -89,7 +88,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     private View mStickerLayout;
     private View mGalleryContent;
     private RecyclerView mGalleryContentView;
-    private GalleryHeaderAdapter mGalleryContentAdapter;
+    private GalleryContentAdapter mGalleryContentAdapter;
 
     public static void start(Context context) {
         Intent starter = new Intent(context, CameraActivity.class);
@@ -145,7 +144,19 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         mBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                switch (newState) {
+                    case BottomSheetBehavior.STATE_COLLAPSED:
+                        mGalleryContent.setVisibility(View.GONE);
+                        break;
 
+                    case BottomSheetBehavior.STATE_EXPANDED:
+                        mGalleryContent.setVisibility(View.VISIBLE);
+                        break;
+
+                    case BottomSheetBehavior.STATE_DRAGGING:
+                        mGalleryContent.setVisibility(View.VISIBLE);
+                        break;
+                }
             }
 
             @Override
@@ -232,8 +243,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 //        mGalleryContentView.setNestedScrollingEnabled(false);
         GridLayoutManager manager = new GridLayoutManager(this, 3, GridLayoutManager.VERTICAL, false);
         mGalleryContentView.setLayoutManager(manager);
-
-        mGalleryContentAdapter = new GalleryHeaderAdapter();
+        mGalleryContentAdapter = new GalleryContentAdapter();
         mGalleryContentAdapter.setOnFilterChangeListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -242,10 +252,17 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         });
 
         mGalleryContentView.setAdapter(mGalleryContentAdapter);
-
-        final StickyRecyclerHeadersDecoration headersDecoration = new StickyRecyclerHeadersDecoration(mGalleryContentAdapter);
-        mGalleryContentView.addItemDecoration(headersDecoration);
-
+        manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                switch (mGalleryContentAdapter.getItemViewType(position)) {
+                    case MediaItem.TYPE_HEADER:
+                        return 3;
+                    default:
+                        return 1;
+                }
+            }
+        });
     }
 
 
@@ -277,17 +294,28 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor cursor) {
         List<MediaItem> mediaItems = new LinkedList<>() ;
+        List<MediaItem> mContentMediaItems = new LinkedList<>() ;
+        long dateIndex = 0;
         while (cursor.moveToNext()) {
+            long date = cursor.getLong(2);
+            if (date != dateIndex) {
+                dateIndex = date;
+                MediaItem headerItem = MediaItem.createHeaderItem(date);
+                headerItem.type = MediaItem.TYPE_HEADER;
+                mContentMediaItems.add(headerItem);
+            }
             long id = cursor.getLong(0) ;
             String filePath = cursor.getString(1) ;
             int mediaType = cursor.getInt(3) ;
-
+            MediaItem item = MediaItem.create(id, mediaType, filePath, date);
+            item.type = MediaItem.TYPE_ITEM;
             Log.e("ryze_photo", "### 1 media id : " + id
                     + ", 2 : " + filePath + ", 3 : " + cursor.getString(2) + ", 4 : " + mediaType);
-            mediaItems.add(MediaItem.create(id, mediaType, filePath)) ;
+            mediaItems.add(item) ;
+            mContentMediaItems.add(item);
         }
         mGalleryAdapter.addMedia(mediaItems);
-        mGalleryContentAdapter.addMedia(mediaItems);
+        mGalleryContentAdapter.addMedia(mContentMediaItems);
         cursor.close();
     }
 
