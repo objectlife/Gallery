@@ -57,7 +57,7 @@
                    android:layout_width="match_parent"
                    android:layout_height="match_parent"
                    android:layout_gravity="center"
-                   android:scaleType="centerInside"
+                   android:scaleType="fitCenter"
         />
     </com.weshare.widgets.SmartStickerView>
 
