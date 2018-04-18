@@ -48,6 +48,7 @@ public class CameraView extends FrameLayout {
      * The camera device faces the same direction as the device's screen.
      */
     public static final int FACING_FRONT = Constants.FACING_FRONT;
+    private OnTapListener mTapListener;
 
     /**
      * Direction the camera faces relative to device screen.
@@ -254,6 +255,9 @@ public class CameraView extends FrameLayout {
     }
 
     private void tapToFocus(MotionEvent event) {
+        if ( mTapListener != null ) {
+            mTapListener.onTap();
+        }
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             float x = event.getX();
             float y = event.getY();
@@ -475,6 +479,15 @@ public class CameraView extends FrameLayout {
         if (mImpl != null) {
             mImpl.setPixelsPerOneZoomLevel(pixels);
         }
+    }
+
+
+    public void setOnTapListener(OnTapListener tabListener) {
+        this.mTapListener = tabListener;
+    }
+
+    public interface OnTapListener {
+        void onTap();
     }
 
     protected static class SavedState extends BaseSavedState {

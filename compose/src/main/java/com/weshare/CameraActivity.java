@@ -40,8 +40,10 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -96,6 +98,10 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     private RecyclerView mGalleryGridView;
     private GalleryGridAdapter mGalleryGridAdapter;
 
+    View mStickerRootLayout ;
+    View mBottomSheetLayout ;
+
+
     public static void start(Context context) {
         Intent starter = new Intent(context, CameraActivity.class);
         context.startActivity(starter);
@@ -129,12 +135,34 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         cameraView.setFlash(CameraView.FLASH_AUTO);
         FocusView view = findViewById(R.id.focus_view) ;
         cameraView.setFocusView(view);
+        cameraView.setOnTapListener(new CameraView.OnTapListener() {
+            @Override
+            public void onTap() {
+                hideBottomSheetLayout();
+            }
+        });
 
         shutterEffect = findViewById(R.id.shutter_effect);
     }
 
+    boolean isAnimating = false ;
 
-    View mStickerRootLayout ;
+    private void hideBottomSheetLayout() {
+        if ( mBottomSheetLayout != null && !isAnimating ) {
+            isAnimating = true ;
+            mBottomSheetLayout.animate().translationX(-getResources().getDisplayMetrics().widthPixels).setInterpolator(new DecelerateInterpolator()).setListener(new AnimatorListenerAdapter() {
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    isAnimating = false ;
+                    mBottomSheetLayout.setVisibility(View.GONE);
+                }
+            }).setDuration(500).start();
+        }
+    }
+
+
+
 
     private void initActionLayout() {
         actionLayout = findViewById(R.id.bottom_layout);
@@ -151,8 +179,10 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         initImageLoaders();
     }
 
+
     private void initBehavior() {
-        mBehavior = BottomSheetBehavior.from(findViewById(R.id.design_bottom_sheet));
+        mBottomSheetLayout = findViewById(R.id.design_bottom_sheet) ;
+        mBehavior = BottomSheetBehavior.from(mBottomSheetLayout);
         mBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
@@ -329,12 +359,12 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         try {
             while (cursor.moveToNext()) {
                 long date = cursor.getLong(2);
-                long offset = date - nowTimestamp ;
+                long offset = nowTimestamp - date ;
                 if ( offset  <= 3 * DAY_SECONDS && headerItem == null ) {
                     headerItem = MediaItem.createHeaderItem("最近");
                     headerItem.type = MediaItem.TYPE_HEADER;
                     mContentMediaItems.add(headerItem);
-                } else if ( othersHeaderItem == null ){
+                } else if ( offset  > 3 * DAY_SECONDS && othersHeaderItem == null ){
                     othersHeaderItem = MediaItem.createHeaderItem("3天之前");
                     othersHeaderItem.type = MediaItem.TYPE_HEADER;
                     mContentMediaItems.add(othersHeaderItem);
@@ -511,6 +541,27 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 //        ImageEditActivity.start(this, filePath);
     }
 
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ( mGalleryGridLayout.isShown() && mBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED ) {
+            mBehavior.setHideable(true);
+            mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        if ( mGalleryGridLayout.isShown() && mBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED ) {
+            mBehavior.setHideable(true);
+            mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            return;
+        }
+        super.onBackPressed();
+    }
 
     @Override
     protected void onDestroy() {
